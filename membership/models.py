@@ -9,19 +9,25 @@ class Member(models.Model):
 
     full_name = models.CharField(max_length=100)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
+    age_category = models.CharField(max_length=20)  # Assuming added in form
+
     dob = models.DateField(null=True, blank=True)
-    marital_status = models.CharField(max_length=20, choices=MARITAL_CHOICES)
-    phone = models.CharField(max_length=15)
+    marital_status = models.CharField(max_length=20, choices=MARITAL_CHOICES, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
     email = models.EmailField(blank=True)
-    address = models.CharField(max_length=255, blank=True)
+    address = models.CharField(max_length=255)
+
     salvation_date = models.DateField(null=True, blank=True)
     baptized = models.CharField(max_length=5, choices=BAPTIZED_CHOICES)
     baptism_date = models.DateField(null=True, blank=True)
-    membership_class = models.CharField(max_length=10, choices=CLASS_CHOICES)
+
+    membership_class = models.CharField(max_length=10, choices=CLASS_CHOICES, blank=True)
     previous_church = models.CharField(max_length=100, blank=True)
+
     emergency_name = models.CharField(max_length=100)
     emergency_relation = models.CharField(max_length=50)
     emergency_phone = models.CharField(max_length=15)
+
     membership_type = models.CharField(max_length=20, choices=MEMBERSHIP_CHOICES)
     registration_date = models.DateField()
 
