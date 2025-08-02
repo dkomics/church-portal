@@ -22,4 +22,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("membership.urls")),
     path("signup/", register_page, name="member-signup"),
+    path("", include("membership.urls")),
 ]
