@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -5,54 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fomu ya Usajili wa Mshirika wa Kanisa</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-      background-color: #f9f9f9;
-    }
-    h2 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-    }
-    label {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, select {
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .error {
-      color: #e74c3c;
-      font-size: 0.9em;
-      margin-top: 2px;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #2ecc71;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #27ae60;
-    }
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9; }
+    h2 { text-align: center; color: #2c3e50; }
+    form { display: flex; flex-direction: column; }
+    label { margin-top: 10px; font-weight: bold; }
+    input, select { padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    .error { color: #e74c3c; font-size: 0.9em; margin-top: 2px; }
+    button { margin-top: 20px; padding: 10px; background-color: #2ecc71; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+    button:hover { background-color: #27ae60; }
   </style>
 </head>
 <body>
   <h2>Fomu ya Usajili wa Mshirika wa Kanisa</h2>
-  <form id="memberForm" novalidate>
+  <form id="memberForm" method="POST" novalidate>
+    {% csrf_token %}
     <label for="full_name">Jina Kamili</label>
     <input type="text" id="full_name" name="full_name" required>
     <div class="error" id="error-full_name"></div>
@@ -126,9 +93,14 @@
   </form>
 
   <script>
+    function getCookie(name) {
+      const value = "; " + document.cookie;
+      const parts = value.split("; " + name + "=");
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
     document.getElementById("memberForm").addEventListener("submit", async function(event) {
       event.preventDefault();
-      // Clear previous errors
       document.querySelectorAll('.error').forEach(div => div.textContent = '');
 
       const form = event.target;
@@ -139,7 +111,10 @@
       try {
         const response = await fetch("/api/register/", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie('csrftoken'),
+          },
           body: JSON.stringify(data),
         });
 
@@ -147,16 +122,14 @@
           alert("Usajili umefanikiwa!");
           form.reset();
         } else {
-          let errors;
           const contentType = response.headers.get('Content-Type') || '';
           if (contentType.includes('application/json')) {
-            errors = await response.json();
+            const errors = await response.json();
             Object.keys(errors).forEach(field => {
               const el = document.getElementById(`error-${field}`);
               if (el) el.textContent = errors[field].join(' ');
             });
           } else {
-            // Fallback: show text
             const text = await response.text();
             alert('Hitilafu: ' + text);
           }
