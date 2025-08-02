@@ -9,6 +9,7 @@
     body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9; }
     h2 { text-align: center; color: #2c3e50; }
     form { display: flex; flex-direction: column; }
+    .form-error { color: #e74c3c; font-size: 1em; margin-bottom: 10px; }
     label { margin-top: 10px; font-weight: bold; }
     input, select { padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
     .error { color: #e74c3c; font-size: 0.9em; margin-top: 2px; }
@@ -20,6 +21,9 @@
   <h2>Fomu ya Usajili wa Mshirika wa Kanisa</h2>
   <form id="memberForm" method="POST" novalidate>
     {% csrf_token %}
+    <div id="formError" class="form-error"></div>
+
+    <!-- Personal Details -->
     <label for="full_name">Jina Kamili</label>
     <input type="text" id="full_name" name="full_name" required>
     <div class="error" id="error-full_name"></div>
@@ -33,6 +37,10 @@
     </select>
     <div class="error" id="error-gender"></div>
 
+    <label for="dob">Tarehe ya Kuzaliwa</label>
+    <input type="date" id="dob" name="dob">
+    <div class="error" id="error-dob"></div>
+
     <label for="marital_status">Hali ya Ndoa</label>
     <select id="marital_status" name="marital_status" required>
       <option value="">Chagua...</option>
@@ -43,9 +51,23 @@
     </select>
     <div class="error" id="error-marital_status"></div>
 
+    <!-- Contact -->
     <label for="phone">Namba ya Simu</label>
     <input type="tel" id="phone" name="phone" required>
     <div class="error" id="error-phone"></div>
+
+    <label for="email">Barua Pepe</label>
+    <input type="email" id="email" name="email">
+    <div class="error" id="error-email"></div>
+
+    <label for="address">Anuani ya Nyumbani</label>
+    <input type="text" id="address" name="address">
+    <div class="error" id="error-address"></div>
+
+    <!-- Spiritual Info -->
+    <label for="salvation_date">Tarehe ya Kuokoka</label>
+    <input type="date" id="salvation_date" name="salvation_date">
+    <div class="error" id="error-salvation_date"></div>
 
     <label for="baptized">Umebatizwa?</label>
     <select id="baptized" name="baptized" required>
@@ -54,6 +76,10 @@
       <option value="No">Hapana</option>
     </select>
     <div class="error" id="error-baptized"></div>
+
+    <label for="baptism_date">Tarehe ya Ubatizo</label>
+    <input type="date" id="baptism_date" name="baptism_date">
+    <div class="error" id="error-baptism_date"></div>
 
     <label for="membership_class">Umehudhuria Darasa la Ushirika?</label>
     <select id="membership_class" name="membership_class" required>
@@ -64,6 +90,11 @@
     </select>
     <div class="error" id="error-membership_class"></div>
 
+    <label for="previous_church">Kanisa la Awali (kama lipo)</label>
+    <input type="text" id="previous_church" name="previous_church">
+    <div class="error" id="error-previous_church"></div>
+
+    <!-- Emergency Contact -->
     <label for="emergency_name">Jina la Mtu wa Dharura</label>
     <input type="text" id="emergency_name" name="emergency_name" required>
     <div class="error" id="error-emergency_name"></div>
@@ -76,6 +107,7 @@
     <input type="tel" id="emergency_phone" name="emergency_phone" required>
     <div class="error" id="error-emergency_phone"></div>
 
+    <!-- Membership -->
     <label for="membership_type">Aina ya Ushirika</label>
     <select id="membership_type" name="membership_type" required>
       <option value="">Chagua...</option>
@@ -101,6 +133,7 @@
 
     document.getElementById("memberForm").addEventListener("submit", async function(event) {
       event.preventDefault();
+      document.getElementById('formError').textContent = '';
       document.querySelectorAll('.error').forEach(div => div.textContent = '');
 
       const form = event.target;
@@ -119,23 +152,20 @@
         });
 
         if (response.ok) {
-          alert("Usajili umefanikiwa!");
           form.reset();
+          document.getElementById('formError').style.color = '#2ecc71';
+          document.getElementById('formError').textContent = 'Usajili umefanikiwa!';
+        } else if (response.status >= 500) {
+          document.getElementById('formError').textContent = 'Hitilafu ya server. Tafadhali jaribu tena.';
         } else {
-          const contentType = response.headers.get('Content-Type') || '';
-          if (contentType.includes('application/json')) {
-            const errors = await response.json();
-            Object.keys(errors).forEach(field => {
-              const el = document.getElementById(`error-${field}`);
-              if (el) el.textContent = errors[field].join(' ');
-            });
-          } else {
-            const text = await response.text();
-            alert('Hitilafu: ' + text);
-          }
+          const errors = await response.json();
+          Object.keys(errors).forEach(field => {
+            const el = document.getElementById(`error-${field}`);
+            if (el) el.textContent = errors[field].join(' ');
+          });
         }
       } catch (error) {
-        alert("Mtandao umeshindwa: " + error.message);
+        document.getElementById('formError').textContent = 'Mtandao umeshindwa: ' + error.message;
       }
     });
   </script>
