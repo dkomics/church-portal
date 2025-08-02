@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "dj_database_url",
+    "whitenoise.runserver_nostatic",
     "membership",
 ]
 
@@ -125,15 +127,4 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← add this
-    # ... other middleware ...
-]
-
-INSTALLED_APPS = [
-    # ...,
-    'whitenoise.runserver_nostatic',  # if you want whitenoise in dev
-    'django.contrib.staticfiles',
-    # ...,
-]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
