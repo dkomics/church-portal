@@ -147,11 +147,19 @@
           alert("Usajili umefanikiwa!");
           form.reset();
         } else {
-          const errors = await response.json();
-          Object.keys(errors).forEach(field => {
-            const el = document.getElementById(`error-${field}`);
-            if (el) el.textContent = errors[field].join(' ');
-          });
+          let errors;
+          const contentType = response.headers.get('Content-Type') || '';
+          if (contentType.includes('application/json')) {
+            errors = await response.json();
+            Object.keys(errors).forEach(field => {
+              const el = document.getElementById(`error-${field}`);
+              if (el) el.textContent = errors[field].join(' ');
+            });
+          } else {
+            // Fallback: show text
+            const text = await response.text();
+            alert('Hitilafu: ' + text);
+          }
         }
       } catch (error) {
         alert("Mtandao umeshindwa: " + error.message);
