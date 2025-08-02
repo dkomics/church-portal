@@ -89,13 +89,13 @@ DATABASES = {
 }
 
 # Override DATABASES default if DATABASE_URL is provided
-DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASES['default'],
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
+sqlite_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+
+DATABASES['default'] = dj_database_url.config(
+    default=os.getenv("DATABASE_URL", sqlite_url),
+    conn_max_age=600,
+    ssl_require=True
+)
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
