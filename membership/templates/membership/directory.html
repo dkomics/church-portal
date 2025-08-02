@@ -6,7 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Orodha ya Washirika</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      padding: 20px;
+    }
     h2 { text-align: center; color: #2c3e50; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
@@ -19,6 +24,7 @@
   <table id="memberTable">
     <thead>
       <tr>
+        <th>ID</th>
         <th>Jina Kamili</th>
         <th>Jinsia</th>
         <th>Umri</th>
@@ -39,6 +45,7 @@
         data.forEach(member => {
           const row = document.createElement('tr');
           row.innerHTML = `
+            <td>${member.membership_id}</td>
             <td>${member.full_name}</td>
             <td>${member.gender}</td>
             <td>${member.age_category || ''}</td>

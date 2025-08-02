@@ -6,7 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fomu ya Usajili wa Mshirika wa Kanisa</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9; }
+    body {
+      font-family: Arial, sans-serif;
+      background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      padding: 20px;
+    }
     h2 { text-align: center; color: #2c3e50; }
     form { display: flex; flex-direction: column; }
     .form-error { color: #e74c3c; font-size: 1em; margin-bottom: 10px; }
