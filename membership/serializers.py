@@ -7,12 +7,13 @@ class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
         fields = [
-            'full_name', 'gender', 'age_category', 'dob', 'marital_status',
+            'membership_id', 'full_name', 'gender', 'age_category', 'dob', 'marital_status',
             'phone', 'email', 'address', 'salvation_date', 'baptized',
             'baptism_date', 'membership_class', 'previous_church',
             'emergency_name', 'emergency_relation', 'emergency_phone',
             'membership_type', 'registration_date'
         ]
+        read_only_fields = ['membership_id']
         extra_kwargs = {
             # required=True is default for all, so we explicitly set false for optional
             'dob':             {'required': False, 'allow_null': True},
