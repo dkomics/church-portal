@@ -24,11 +24,16 @@
       margin-top: 10px;
       font-weight: bold;
     }
-    input, select, textarea {
+    input, select {
       padding: 8px;
       margin-top: 5px;
       border: 1px solid #ccc;
       border-radius: 4px;
+    }
+    .error {
+      color: #e74c3c;
+      font-size: 0.9em;
+      margin-top: 2px;
     }
     button {
       margin-top: 20px;
@@ -47,10 +52,75 @@
 </head>
 <body>
   <h2>Fomu ya Usajili wa Mshirika wa Kanisa</h2>
-  <form id="memberForm">
-    <!-- [Form fields stay the same] -->
+  <form id="memberForm" novalidate>
+    <label for="full_name">Jina Kamili</label>
+    <input type="text" id="full_name" name="full_name" required>
+    <div class="error" id="error-full_name"></div>
 
-    <!-- [Your form inputs go here, unchanged for brevity] -->
+    <label for="gender">Jinsia</label>
+    <select id="gender" name="gender" required>
+      <option value="">Chagua...</option>
+      <option value="Male">Mwanaume</option>
+      <option value="Female">Mwanamke</option>
+      <option value="Prefer not to say">Sipendi kusema</option>
+    </select>
+    <div class="error" id="error-gender"></div>
+
+    <label for="marital_status">Hali ya Ndoa</label>
+    <select id="marital_status" name="marital_status" required>
+      <option value="">Chagua...</option>
+      <option value="Single">Bila ndoa</option>
+      <option value="Married">Kwenye ndoa</option>
+      <option value="Divorced">Talaka</option>
+      <option value="Widowed">Mjane</option>
+    </select>
+    <div class="error" id="error-marital_status"></div>
+
+    <label for="phone">Namba ya Simu</label>
+    <input type="tel" id="phone" name="phone" required>
+    <div class="error" id="error-phone"></div>
+
+    <label for="baptized">Umebatizwa?</label>
+    <select id="baptized" name="baptized" required>
+      <option value="">Chagua...</option>
+      <option value="Yes">Ndio</option>
+      <option value="No">Hapana</option>
+    </select>
+    <div class="error" id="error-baptized"></div>
+
+    <label for="membership_class">Umehudhuria Darasa la Ushirika?</label>
+    <select id="membership_class" name="membership_class" required>
+      <option value="">Chagua...</option>
+      <option value="Yes">Ndio</option>
+      <option value="No">Hapana</option>
+      <option value="Not Yet">Bado</option>
+    </select>
+    <div class="error" id="error-membership_class"></div>
+
+    <label for="emergency_name">Jina la Mtu wa Dharura</label>
+    <input type="text" id="emergency_name" name="emergency_name" required>
+    <div class="error" id="error-emergency_name"></div>
+
+    <label for="emergency_relation">Mahusiano</label>
+    <input type="text" id="emergency_relation" name="emergency_relation" required>
+    <div class="error" id="error-emergency_relation"></div>
+
+    <label for="emergency_phone">Namba ya Simu ya Dharura</label>
+    <input type="tel" id="emergency_phone" name="emergency_phone" required>
+    <div class="error" id="error-emergency_phone"></div>
+
+    <label for="membership_type">Aina ya Ushirika</label>
+    <select id="membership_type" name="membership_type" required>
+      <option value="">Chagua...</option>
+      <option value="New">Mshirika Mpya</option>
+      <option value="Transfer">Aliyehamia</option>
+      <option value="Returning">Anayerudi</option>
+    </select>
+    <div class="error" id="error-membership_type"></div>
+
+    <label for="registration_date">Tarehe ya Usajili</label>
+    <input type="date" id="registration_date" name="registration_date" required>
+    <div class="error" id="error-registration_date"></div>
 
     <button type="submit">Sajili</button>
   </form>
@@ -58,27 +128,30 @@
   <script>
     document.getElementById("memberForm").addEventListener("submit", async function(event) {
       event.preventDefault();
-      const formData = new FormData(event.target);
+      // Clear previous errors
+      document.querySelectorAll('.error').forEach(div => div.textContent = '');
+
+      const form = event.target;
+      const formData = new FormData(form);
       const data = {};
-      formData.forEach((value, key) => {
-        data[key] = value;
-      });
+      formData.forEach((value, key) => data[key] = value);
 
       try {
         const response = await fetch("/api/register/", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
 
         if (response.ok) {
           alert("Usajili umefanikiwa!");
-          event.target.reset();
+          form.reset();
         } else {
-          const error = await response.json();
-          alert("Hitilafu: " + JSON.stringify(error));
+          const errors = await response.json();
+          Object.keys(errors).forEach(field => {
+            const el = document.getElementById(`error-${field}`);
+            if (el) el.textContent = errors[field].join(' ');
+          });
         }
       } catch (error) {
         alert("Mtandao umeshindwa: " + error.message);
