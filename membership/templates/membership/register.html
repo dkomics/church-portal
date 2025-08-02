@@ -23,12 +23,13 @@
     {% csrf_token %}
     <div id="formError" class="form-error"></div>
 
-    <!-- Personal Details -->
-    <label for="full_name">Jina Kamili</label>
+    <!-- Mandatory: Jina Kamili -->
+    <label for="full_name">Jina Kamili *</label>
     <input type="text" id="full_name" name="full_name" required>
     <div class="error" id="error-full_name"></div>
 
-    <label for="gender">Jinsia</label>
+    <!-- Mandatory: Jinsia -->
+    <label for="gender">Jinsia *</label>
     <select id="gender" name="gender" required>
       <option value="">Chagua...</option>
       <option value="Male">Mwanaume</option>
@@ -37,12 +38,24 @@
     </select>
     <div class="error" id="error-gender"></div>
 
+    <!-- Mandatory: Umri (mtoto, kijana, mtu mzima) -->
+    <label for="age_category">Umri (mtoto, kijana, mtu mzima) *</label>
+    <select id="age_category" name="age_category" required>
+      <option value="">Chagua...</option>
+      <option value="Mtoto">Mtoto</option>
+      <option value="Kijana">Kijana</option>
+      <option value="Mtu mzima">Mtu mzima</option>
+    </select>
+    <div class="error" id="error-age_category"></div>
+
+    <!-- Optional: Tarehe ya Kuzaliwa -->
     <label for="dob">Tarehe ya Kuzaliwa</label>
     <input type="date" id="dob" name="dob">
     <div class="error" id="error-dob"></div>
 
+    <!-- Optional: Hali ya Ndoa -->
     <label for="marital_status">Hali ya Ndoa</label>
-    <select id="marital_status" name="marital_status" required>
+    <select id="marital_status" name="marital_status">
       <option value="">Chagua...</option>
       <option value="Single">Bila ndoa</option>
       <option value="Married">Kwenye ndoa</option>
@@ -51,25 +64,28 @@
     </select>
     <div class="error" id="error-marital_status"></div>
 
-    <!-- Contact -->
+    <!-- Optional: Namba ya Simu -->
     <label for="phone">Namba ya Simu</label>
-    <input type="tel" id="phone" name="phone" required>
+    <input type="tel" id="phone" name="phone">
     <div class="error" id="error-phone"></div>
 
+    <!-- Optional: Barua Pepe -->
     <label for="email">Barua Pepe</label>
     <input type="email" id="email" name="email">
     <div class="error" id="error-email"></div>
 
-    <label for="address">Anuani ya Nyumbani</label>
-    <input type="text" id="address" name="address">
+    <!-- Mandatory: Anuani ya Nyumbani -->
+    <label for="address">Anuani ya Nyumbani *</label>
+    <input type="text" id="address" name="address" required>
     <div class="error" id="error-address"></div>
 
-    <!-- Spiritual Info -->
+    <!-- Optional: Tarehe ya Kuokoka -->
     <label for="salvation_date">Tarehe ya Kuokoka</label>
     <input type="date" id="salvation_date" name="salvation_date">
     <div class="error" id="error-salvation_date"></div>
 
-    <label for="baptized">Umebatizwa?</label>
+    <!-- Mandatory: Umebatizwa? -->
+    <label for="baptized">Umebatizwa? *</label>
     <select id="baptized" name="baptized" required>
       <option value="">Chagua...</option>
       <option value="Yes">Ndio</option>
@@ -77,12 +93,14 @@
     </select>
     <div class="error" id="error-baptized"></div>
 
+    <!-- Optional: Tarehe ya Ubatizo -->
     <label for="baptism_date">Tarehe ya Ubatizo</label>
     <input type="date" id="baptism_date" name="baptism_date">
     <div class="error" id="error-baptism_date"></div>
 
+    <!-- Optional: Darasa la Ushirika -->
     <label for="membership_class">Umehudhuria Darasa la Ushirika?</label>
-    <select id="membership_class" name="membership_class" required>
+    <select id="membership_class" name="membership_class">
       <option value="">Chagua...</option>
       <option value="Yes">Ndio</option>
       <option value="No">Hapana</option>
@@ -90,25 +108,28 @@
     </select>
     <div class="error" id="error-membership_class"></div>
 
+    <!-- Optional: Kanisa la Awali -->
     <label for="previous_church">Kanisa la Awali (kama lipo)</label>
     <input type="text" id="previous_church" name="previous_church">
     <div class="error" id="error-previous_church"></div>
 
-    <!-- Emergency Contact -->
-    <label for="emergency_name">Jina la Mtu wa Dharura</label>
+    <!-- Mandatory: Jina la Mtu wa Dharura -->
+    <label for="emergency_name">Jina la Mtu wa Dharura *</label>
     <input type="text" id="emergency_name" name="emergency_name" required>
     <div class="error" id="error-emergency_name"></div>
 
-    <label for="emergency_relation">Mahusiano</label>
+    <!-- Mandatory: Mahusiano -->
+    <label for="emergency_relation">Mahusiano *</label>
     <input type="text" id="emergency_relation" name="emergency_relation" required>
     <div class="error" id="error-emergency_relation"></div>
 
-    <label for="emergency_phone">Namba ya Simu ya Dharura</label>
+    <!-- Mandatory: Namba ya Simu ya Dharura -->
+    <label for="emergency_phone">Namba ya Simu ya Dharura *</label>
     <input type="tel" id="emergency_phone" name="emergency_phone" required>
     <div class="error" id="error-emergency_phone"></div>
 
-    <!-- Membership -->
-    <label for="membership_type">Aina ya Ushirika</label>
+    <!-- Mandatory: Aina ya Ushirika -->
+    <label for="membership_type">Aina ya Ushirika *</label>
     <select id="membership_type" name="membership_type" required>
       <option value="">Chagua...</option>
       <option value="New">Mshirika Mpya</option>
@@ -117,7 +138,8 @@
     </select>
     <div class="error" id="error-membership_type"></div>
 
-    <label for="registration_date">Tarehe ya Usajili</label>
+    <!-- Mandatory: Tarehe ya Usajili -->
+    <label for="registration_date">Tarehe ya Usajili *</label>
     <input type="date" id="registration_date" name="registration_date" required>
     <div class="error" id="error-registration_date"></div>
 
@@ -130,27 +152,20 @@
       const parts = value.split("; " + name + "=");
       if (parts.length === 2) return parts.pop().split(';').shift();
     }
-
     document.getElementById("memberForm").addEventListener("submit", async function(event) {
       event.preventDefault();
       document.getElementById('formError').textContent = '';
       document.querySelectorAll('.error').forEach(div => div.textContent = '');
-
       const form = event.target;
       const formData = new FormData(form);
       const data = {};
       formData.forEach((value, key) => data[key] = value);
-
       try {
         const response = await fetch("/api/register/", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": getCookie('csrftoken'),
-          },
+          headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie('csrftoken') },
           body: JSON.stringify(data),
         });
-
         if (response.ok) {
           form.reset();
           document.getElementById('formError').style.color = '#2ecc71';
