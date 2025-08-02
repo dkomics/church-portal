@@ -5,3 +5,4 @@ gunicorn
 psycopg2-binary
 dj-database-url
 whitenoise
+sentry-sdk>=1.5.0
