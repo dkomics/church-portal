@@ -16,11 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from membership.views import register_page
+from membership.views import MemberListView, member_directory_page, MemberCreateView, register_page
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("membership.urls")),
+
+    # API endpoints
+    path("api/members/", MemberListView.as_view(), name="member-list"),
+    path("api/register/", MemberCreateView.as_view(), name="member-register"),
+
+    # Front-end pages
     path("signup/", register_page, name="member-signup"),
-    path("", include("membership.urls")),
+    path("members/", member_directory_page, name="member-directory"),
 ]
