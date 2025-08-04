@@ -1,4 +1,7 @@
 from django.db import models
+from django.core.validators import RegexValidator
+from django.utils import timezone
+import uuid
 
 class Member(models.Model):
     GENDER_CHOICES = [('Male', 'Mwanaume'), ('Female', 'Mwanamke'), ('Prefer not to say', 'Sipendi kusema')]
@@ -41,5 +44,72 @@ class Member(models.Model):
         null=True,     # stores NULL in the DB until set
         editable=True  # admin can edit it in the Django admin UI
     )
+    def save(self, *args, **kwargs):
+        # Auto-generate membership ID if not provided
+        if not self.membership_id:
+            self.membership_id = self.generate_membership_id()
+        super().save(*args, **kwargs)
+    
+    def generate_membership_id(self):
+        """Generate a unique membership ID"""
+        # Format: YEAR + 4-digit sequential number
+        year = timezone.now().year
+        last_member = Member.objects.filter(
+            membership_id__startswith=str(year)
+        ).order_by('membership_id').last()
+        
+        if last_member and last_member.membership_id:
+            try:
+                last_number = int(last_member.membership_id[4:])
+                new_number = last_number + 1
+            except (ValueError, IndexError):
+                new_number = 1
+        else:
+            new_number = 1
+        
+        return f"{year}{new_number:04d}"
+    
+    @property
+    def age_from_dob(self):
+        """Calculate age from date of birth"""
+        if self.dob:
+            today = timezone.now().date()
+            return today.year - self.dob.year - ((today.month, today.day) < (self.dob.month, self.dob.day))
+        return None
+    
+    @property
+    def is_baptized(self):
+        """Check if member is baptized"""
+        return self.baptized == 'Yes'
+    
+    @property
+    def has_completed_membership_class(self):
+        """Check if member has completed membership class"""
+        return self.membership_class == 'Yes'
+    
+    def get_display_name(self):
+        """Get formatted display name"""
+        return self.full_name.title()
+    
+    def get_contact_info(self):
+        """Get formatted contact information"""
+        contacts = []
+        if self.phone:
+            contacts.append(f"Simu: {self.phone}")
+        if self.email:
+            contacts.append(f"Email: {self.email}")
+        return " | ".join(contacts) if contacts else "Hakuna taarifa za mawasiliano"
+    
+    class Meta:
+        ordering = ['-registration_date', 'full_name']
+        verbose_name = "Mshirika"
+        verbose_name_plural = "Washirika"
+        indexes = [
+            models.Index(fields=['membership_id']),
+            models.Index(fields=['full_name']),
+            models.Index(fields=['registration_date']),
+            models.Index(fields=['membership_type']),
+        ]
+    
     def __str__(self):
-        return self.full_name
+        return f"{self.membership_id} - {self.full_name}" if self.membership_id else self.full_name

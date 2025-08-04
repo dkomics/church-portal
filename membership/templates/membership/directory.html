@@ -5,61 +5,104 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Orodha ya Washirika</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed;
-      background-size: cover;
-      padding: 20px;
-    }
-    h2 { text-align: center; color: #2c3e50; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #2ecc71; color: white; }
-    tr:nth-child(even) { background-color: #f2f2f2; }
-  </style>
+  <link rel="stylesheet" href="{% static 'css/directory.css' %}">
 </head>
 <body>
-  <h2>Orodha ya Washirika Waliosajiliwa</h2>
-  <table id="memberTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Jina Kamili</th>
-        <th>Jinsia</th>
-        <th>Umri</th>
-        <th>Namba ya Dharura</th>
-        <th>Aina ya Ushirika</th>
-        <th>Tarehe ya Usajili</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="container">
+    <h2>Orodha ya Washirika Waliosajiliwa</h2>
+    
+    <!-- Statistics Cards -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <h3 id="totalMembers">0</h3>
+        <p>Jumla ya Washirika</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="maleMembers">0</h3>
+        <p>Wanaume</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="femaleMembers">0</h3>
+        <p>Wanawake</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="baptizedMembers">0</h3>
+        <p>Waliobatizwa</p>
+      </div>
+    </div>
 
-  <script>
-    async function loadMembers() {
-      try {
-        const res = await fetch('/api/members/');
-        const data = await res.json();
-        const tbody = document.querySelector('#memberTable tbody');
-        data.forEach(member => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${member.membership_id}</td>
-            <td>${member.full_name}</td>
-            <td>${member.gender}</td>
-            <td>${member.age_category || ''}</td>
-            <td>${member.emergency_phone}</td>
-            <td>${member.membership_type}</td>
-            <td>${member.registration_date}</td>
-          `;
-          tbody.appendChild(row);
-        });
-      } catch (err) {
-        console.error('Failed to load members:', err);
-      }
-    }
-    document.addEventListener('DOMContentLoaded', loadMembers);
-  </script>
+    <!-- Search and Filter Controls -->
+    <div class="controls-section">
+      <div class="search-container">
+        <div class="search-icon">🔍</div>
+        <input type="text" id="searchInput" class="search-input" 
+               placeholder="Tafuta kwa jina, namba ya simu, au ID..."
+               aria-label="Tafuta washirika">
+      </div>
+      
+      <div class="filter-container">
+        <select class="filter-select" data-filter="gender" aria-label="Chuja kwa jinsia">
+          <option value="">Jinsia Zote</option>
+          <option value="Male">Wanaume</option>
+          <option value="Female">Wanawake</option>
+          <option value="Prefer not to say">Hawapendi kusema</option>
+        </select>
+        
+        <select class="filter-select" data-filter="ageCategory" aria-label="Chuja kwa umri">
+          <option value="">Umri Wote</option>
+          <option value="Mtoto">Watoto</option>
+          <option value="Kijana">Vijana</option>
+          <option value="Mtu mzima">Watu wazima</option>
+        </select>
+        
+        <select class="filter-select" data-filter="membershipType" aria-label="Chuja kwa aina ya ushirika">
+          <option value="">Aina Zote za Ushirika</option>
+          <option value="New">Washirika Wapya</option>
+          <option value="Transfer">Waliohamia</option>
+          <option value="Returning">Wanaorudi</option>
+        </select>
+        
+        <select class="filter-select" data-filter="baptized" aria-label="Chuja kwa hali ya ubatizo">
+          <option value="">Hali Zote za Ubatizo</option>
+          <option value="Yes">Waliobatizwa</option>
+          <option value="No">Hawajabatizwa</option>
+        </select>
+      </div>
+      
+      <button id="exportBtn" class="export-btn" aria-label="Hamisha orodha">
+        📊 Hamisha CSV
+      </button>
+    </div>
+
+    <!-- Members Table -->
+    <div class="table-container" role="region" aria-label="Jedwali la washirika">
+      <!-- Table will be populated by JavaScript -->
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+      <div class="pagination-info" aria-live="polite">
+        <!-- Pagination info will be populated by JavaScript -->
+      </div>
+      <div class="pagination" role="navigation" aria-label="Urambazaji wa kurasa">
+        <!-- Pagination buttons will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Details Modal -->
+  <div id="memberModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle" class="modal-title">Maelezo ya Mshirika</h3>
+        <button class="close-btn" aria-label="Funga dirisha">&times;</button>
+      </div>
+      <div class="member-details">
+        <!-- Member details will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'js/directory.js' %}"></script>
 </body>
 </html>

@@ -16,16 +16,30 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from membership.views import MemberListView, member_directory_page, MemberCreateView, register_page
+from django.conf import settings
+from django.conf.urls.static import static
+from membership.views import (
+    MemberListView, member_directory_page, MemberCreateView, 
+    register_page, home_page, member_statistics
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    # Home page
+    path("", home_page, name="home"),
+
     # API endpoints
     path("api/members/", MemberListView.as_view(), name="member-list"),
     path("api/register/", MemberCreateView.as_view(), name="member-register"),
+    path("api/statistics/", member_statistics, name="member-statistics"),
 
     # Front-end pages
     path("signup/", register_page, name="member-signup"),
     path("members/", member_directory_page, name="member-directory"),
 ]
+
+# Serve static files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

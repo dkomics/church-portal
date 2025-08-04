@@ -5,189 +5,210 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fomu ya Usajili wa Mshirika wa Kanisa</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed;
-      background-size: cover;
-      padding: 20px;
-    }
-    h2 { text-align: center; color: #2c3e50; }
-    form { display: flex; flex-direction: column; }
-    .form-error { color: #e74c3c; font-size: 1em; margin-bottom: 10px; }
-    label { margin-top: 10px; font-weight: bold; }
-    input, select { padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
-    .error { color: #e74c3c; font-size: 0.9em; margin-top: 2px; }
-    button { margin-top: 20px; padding: 10px; background-color: #2ecc71; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
-    button:hover { background-color: #27ae60; }
-  </style>
+  <link rel="stylesheet" href="{% static 'css/register.css' %}">
 </head>
 <body>
-  <h2>Fomu ya Usajili wa Mshirika wa Kanisa</h2>
-  <form id="memberForm" method="POST" novalidate>
-    {% csrf_token %}
-    <div id="formError" class="form-error"></div>
+  <div class="container">
+    <h2>Fomu ya Usajili wa Mshirika wa Kanisa</h2>
+    
+    <!-- Progress Bar -->
+    <div class="form-progress">
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="progress-text">Hatua 1 ya 4</div>
+    </div>
 
-    <!-- Mandatory: Jina Kamili -->
-    <label for="full_name">Jina Kamili *</label>
-    <input type="text" id="full_name" name="full_name" required>
-    <div class="error" id="error-full_name"></div>
+    <form id="memberForm" method="POST" novalidate>
+      {% csrf_token %}
+      <div id="formError" class="form-error" role="alert" aria-live="polite"></div>
 
-    <!-- Mandatory: Jinsia -->
-    <label for="gender">Jinsia *</label>
-    <select id="gender" name="gender" required>
-      <option value="">Chagua...</option>
-      <option value="Male">Mwanaume</option>
-      <option value="Female">Mwanamke</option>
-      <option value="Prefer not to say">Sipendi kusema</option>
-    </select>
-    <div class="error" id="error-gender"></div>
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <h3>Taarifa za Kibinafsi</h3>
+        
+        <div class="form-group">
+          <label for="full_name" class="required">Jina Kamili</label>
+          <input type="text" id="full_name" name="full_name" required 
+                 aria-describedby="error-full_name" 
+                 placeholder="Ingiza jina lako kamili">
+          <div class="error" id="error-full_name" role="alert"></div>
+        </div>
 
-    <!-- Mandatory: Umri (mtoto, kijana, mtu mzima) -->
-    <label for="age_category">Umri (mtoto, kijana, mtu mzima) *</label>
-    <select id="age_category" name="age_category" required>
-      <option value="">Chagua...</option>
-      <option value="Mtoto">Mtoto</option>
-      <option value="Kijana">Kijana</option>
-      <option value="Mtu mzima">Mtu mzima</option>
-    </select>
-    <div class="error" id="error-age_category"></div>
+        <div class="form-group">
+          <label for="gender" class="required">Jinsia</label>
+          <select id="gender" name="gender" required aria-describedby="error-gender">
+            <option value="">Chagua...</option>
+            <option value="Male">Mwanaume</option>
+            <option value="Female">Mwanamke</option>
+            <option value="Prefer not to say">Sipendi kusema</option>
+          </select>
+          <div class="error" id="error-gender" role="alert"></div>
+        </div>
 
-    <!-- Optional: Tarehe ya Kuzaliwa -->
-    <label for="dob">Tarehe ya Kuzaliwa</label>
-    <input type="date" id="dob" name="dob">
-    <div class="error" id="error-dob"></div>
+        <div class="form-group">
+          <label for="age_category" class="required">Kundi la Umri</label>
+          <select id="age_category" name="age_category" required aria-describedby="error-age_category">
+            <option value="">Chagua...</option>
+            <option value="Mtoto">Mtoto (chini ya miaka 13)</option>
+            <option value="Kijana">Kijana (miaka 13-25)</option>
+            <option value="Mtu mzima">Mtu mzima (zaidi ya miaka 25)</option>
+          </select>
+          <div class="error" id="error-age_category" role="alert"></div>
+        </div>
 
-    <!-- Optional: Hali ya Ndoa -->
-    <label for="marital_status">Hali ya Ndoa</label>
-    <select id="marital_status" name="marital_status">
-      <option value="">Chagua...</option>
-      <option value="Single">Bila ndoa</option>
-      <option value="Married">Kwenye ndoa</option>
-      <option value="Divorced">Talaka</option>
-      <option value="Widowed">Mjane</option>
-    </select>
-    <div class="error" id="error-marital_status"></div>
+        <div class="form-group">
+          <label for="dob">Tarehe ya Kuzaliwa</label>
+          <input type="date" id="dob" name="dob" aria-describedby="error-dob">
+          <div class="error" id="error-dob" role="alert"></div>
+        </div>
 
-    <!-- Optional: Namba ya Simu -->
-    <label for="phone">Namba ya Simu</label>
-    <input type="tel" id="phone" name="phone">
-    <div class="error" id="error-phone"></div>
+        <div class="form-group">
+          <label for="marital_status">Hali ya Ndoa</label>
+          <select id="marital_status" name="marital_status" aria-describedby="error-marital_status">
+            <option value="">Chagua...</option>
+            <option value="Single">Bila ndoa</option>
+            <option value="Married">Kwenye ndoa</option>
+            <option value="Divorced">Talaka</option>
+            <option value="Widowed">Mjane</option>
+          </select>
+          <div class="error" id="error-marital_status" role="alert"></div>
+        </div>
+      </div>
 
-    <!-- Optional: Barua Pepe -->
-    <label for="email">Barua Pepe</label>
-    <input type="email" id="email" name="email">
-    <div class="error" id="error-email"></div>
+      <!-- Contact Information Section -->
+      <div class="form-section">
+        <h3>Taarifa za Mawasiliano</h3>
+        
+        <div class="form-group">
+          <label for="phone">Namba ya Simu</label>
+          <input type="tel" id="phone" name="phone" 
+                 aria-describedby="error-phone"
+                 placeholder="Mfano: 0712345678">
+          <div class="error" id="error-phone" role="alert"></div>
+        </div>
 
-    <!-- Mandatory: Anuani ya Nyumbani -->
-    <label for="address">Anuani ya Nyumbani *</label>
-    <input type="text" id="address" name="address" required>
-    <div class="error" id="error-address"></div>
+        <div class="form-group">
+          <label for="email">Barua Pepe</label>
+          <input type="email" id="email" name="email" 
+                 aria-describedby="error-email"
+                 placeholder="mfano@email.com">
+          <div class="error" id="error-email" role="alert"></div>
+        </div>
 
-    <!-- Optional: Tarehe ya Kuokoka -->
-    <label for="salvation_date">Tarehe ya Kuokoka</label>
-    <input type="date" id="salvation_date" name="salvation_date">
-    <div class="error" id="error-salvation_date"></div>
+        <div class="form-group">
+          <label for="address" class="required">Anuani ya Nyumbani</label>
+          <input type="text" id="address" name="address" required 
+                 aria-describedby="error-address"
+                 placeholder="Ingiza anuani yako ya nyumbani">
+          <div class="error" id="error-address" role="alert"></div>
+        </div>
+      </div>
 
-    <!-- Mandatory: Umebatizwa? -->
-    <label for="baptized">Umebatizwa? *</label>
-    <select id="baptized" name="baptized" required>
-      <option value="">Chagua...</option>
-      <option value="Yes">Ndio</option>
-      <option value="No">Hapana</option>
-    </select>
-    <div class="error" id="error-baptized"></div>
+      <!-- Spiritual Information Section -->
+      <div class="form-section">
+        <h3>Taarifa za Kiroho</h3>
+        
+        <div class="form-group">
+          <label for="salvation_date">Tarehe ya Kuokoka</label>
+          <input type="date" id="salvation_date" name="salvation_date" 
+                 aria-describedby="error-salvation_date">
+          <div class="error" id="error-salvation_date" role="alert"></div>
+        </div>
 
-    <!-- Optional: Tarehe ya Ubatizo -->
-    <label for="baptism_date">Tarehe ya Ubatizo</label>
-    <input type="date" id="baptism_date" name="baptism_date">
-    <div class="error" id="error-baptism_date"></div>
+        <div class="form-group">
+          <label for="baptized" class="required">Umebatizwa?</label>
+          <select id="baptized" name="baptized" required aria-describedby="error-baptized">
+            <option value="">Chagua...</option>
+            <option value="Yes">Ndio</option>
+            <option value="No">Hapana</option>
+          </select>
+          <div class="error" id="error-baptized" role="alert"></div>
+        </div>
 
-    <!-- Optional: Darasa la Ushirika -->
-    <label for="membership_class">Umehudhuria Darasa la Ushirika?</label>
-    <select id="membership_class" name="membership_class">
-      <option value="">Chagua...</option>
-      <option value="Yes">Ndio</option>
-      <option value="No">Hapana</option>
-      <option value="Not Yet">Bado</option>
-    </select>
-    <div class="error" id="error-membership_class"></div>
+        <div class="form-group conditional-field">
+          <label for="baptism_date">Tarehe ya Ubatizo</label>
+          <input type="date" id="baptism_date" name="baptism_date" 
+                 aria-describedby="error-baptism_date">
+          <div class="error" id="error-baptism_date" role="alert"></div>
+        </div>
 
-    <!-- Optional: Kanisa la Awali -->
-    <label for="previous_church">Kanisa la Awali (kama lipo)</label>
-    <input type="text" id="previous_church" name="previous_church">
-    <div class="error" id="error-previous_church"></div>
+        <div class="form-group">
+          <label for="membership_class">Umehudhuria Darasa la Ushirika?</label>
+          <select id="membership_class" name="membership_class" aria-describedby="error-membership_class">
+            <option value="">Chagua...</option>
+            <option value="Yes">Ndio</option>
+            <option value="No">Hapana</option>
+            <option value="Not Yet">Bado</option>
+          </select>
+          <div class="error" id="error-membership_class" role="alert"></div>
+        </div>
 
-    <!-- Mandatory: Jina la Mtu wa Dharura -->
-    <label for="emergency_name">Jina la Mtu wa Dharura *</label>
-    <input type="text" id="emergency_name" name="emergency_name" required>
-    <div class="error" id="error-emergency_name"></div>
+        <div class="form-group">
+          <label for="previous_church">Kanisa la Awali (kama lipo)</label>
+          <input type="text" id="previous_church" name="previous_church" 
+                 aria-describedby="error-previous_church"
+                 placeholder="Jina la kanisa ulilokuwa ukihudhuria">
+          <div class="error" id="error-previous_church" role="alert"></div>
+        </div>
+      </div>
 
-    <!-- Mandatory: Mahusiano -->
-    <label for="emergency_relation">Mahusiano *</label>
-    <input type="text" id="emergency_relation" name="emergency_relation" required>
-    <div class="error" id="error-emergency_relation"></div>
+      <!-- Emergency Contact & Membership Section -->
+      <div class="form-section">
+        <h3>Mtu wa Dharura na Aina ya Ushirika</h3>
+        
+        <div class="form-group">
+          <label for="emergency_name" class="required">Jina la Mtu wa Dharura</label>
+          <input type="text" id="emergency_name" name="emergency_name" required 
+                 aria-describedby="error-emergency_name"
+                 placeholder="Jina kamili la mtu wa dharura">
+          <div class="error" id="error-emergency_name" role="alert"></div>
+        </div>
 
-    <!-- Mandatory: Namba ya Simu ya Dharura -->
-    <label for="emergency_phone">Namba ya Simu ya Dharura *</label>
-    <input type="tel" id="emergency_phone" name="emergency_phone" required>
-    <div class="error" id="error-emergency_phone"></div>
+        <div class="form-group">
+          <label for="emergency_relation" class="required">Mahusiano</label>
+          <input type="text" id="emergency_relation" name="emergency_relation" required 
+                 aria-describedby="error-emergency_relation"
+                 placeholder="Mfano: Mzazi, Ndugu, Rafiki">
+          <div class="error" id="error-emergency_relation" role="alert"></div>
+        </div>
 
-    <!-- Mandatory: Aina ya Ushirika -->
-    <label for="membership_type">Aina ya Ushirika *</label>
-    <select id="membership_type" name="membership_type" required>
-      <option value="">Chagua...</option>
-      <option value="New">Mshirika Mpya</option>
-      <option value="Transfer">Aliyehamia</option>
-      <option value="Returning">Anayerudi</option>
-    </select>
-    <div class="error" id="error-membership_type"></div>
+        <div class="form-group">
+          <label for="emergency_phone" class="required">Namba ya Simu ya Dharura</label>
+          <input type="tel" id="emergency_phone" name="emergency_phone" required 
+                 aria-describedby="error-emergency_phone"
+                 placeholder="Mfano: 0712345678">
+          <div class="error" id="error-emergency_phone" role="alert"></div>
+        </div>
 
-    <!-- Mandatory: Tarehe ya Usajili -->
-    <label for="registration_date">Tarehe ya Usajili *</label>
-    <input type="date" id="registration_date" name="registration_date" required>
-    <div class="error" id="error-registration_date"></div>
+        <div class="form-group">
+          <label for="membership_type" class="required">Aina ya Ushirika</label>
+          <select id="membership_type" name="membership_type" required aria-describedby="error-membership_type">
+            <option value="">Chagua...</option>
+            <option value="New">Mshirika Mpya</option>
+            <option value="Transfer">Aliyehamia</option>
+            <option value="Returning">Anayerudi</option>
+          </select>
+          <div class="error" id="error-membership_type" role="alert"></div>
+        </div>
 
-    <button type="submit">Sajili</button>
-  </form>
+        <div class="form-group">
+          <label for="registration_date" class="required">Tarehe ya Usajili</label>
+          <input type="date" id="registration_date" name="registration_date" required 
+                 aria-describedby="error-registration_date">
+          <div class="error" id="error-registration_date" role="alert"></div>
+        </div>
+      </div>
 
-  <script>
-    function getCookie(name) {
-      const value = "; " + document.cookie;
-      const parts = value.split("; " + name + "=");
-      if (parts.length === 2) return parts.pop().split(';').shift();
-    }
-    document.getElementById("memberForm").addEventListener("submit", async function(event) {
-      event.preventDefault();
-      document.getElementById('formError').textContent = '';
-      document.querySelectorAll('.error').forEach(div => div.textContent = '');
-      const form = event.target;
-      const formData = new FormData(form);
-      const data = {};
-      formData.forEach((value, key) => data[key] = value);
-      try {
-        const response = await fetch("/api/register/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie('csrftoken') },
-          body: JSON.stringify(data),
-        });
-        if (response.ok) {
-          form.reset();
-          document.getElementById('formError').style.color = '#2ecc71';
-          document.getElementById('formError').textContent = 'Usajili umefanikiwa!';
-        } else if (response.status >= 500) {
-          document.getElementById('formError').textContent = 'Hitilafu ya server. Tafadhali jaribu tena.';
-        } else {
-          const errors = await response.json();
-          Object.keys(errors).forEach(field => {
-            const el = document.getElementById(`error-${field}`);
-            if (el) el.textContent = errors[field].join(' ');
-          });
-        }
-      } catch (error) {
-        document.getElementById('formError').textContent = 'Mtandao umeshindwa: ' + error.message;
-      }
-    });
-  </script>
+      <div class="btn-container">
+        <button type="submit">
+          <span class="loading-spinner"></span>
+          Sajili
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script src="{% static 'js/register.js' %}"></script>
 </body>
 </html>

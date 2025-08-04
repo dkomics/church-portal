@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mfumo wa Usajili wa Washirika - Kanisa</title>
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <h1>🏛️ Mfumo wa Usajili wa Washirika</h1>
+        <p>Kanisa la Biblia la Furaha na Matumaini - Arusha</p>
+      </div>
+      <nav class="navigation">
+        <a href="{% url 'home' %}" class="nav-link active">Nyumbani</a>
+        <a href="{% url 'member-signup' %}" class="nav-link">Sajili</a>
+        <a href="{% url 'member-directory' %}" class="nav-link">Orodha</a>
+        <a href="/admin/" class="nav-link">Utawala</a>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h2>Karibu Katika Familia ya Kanisa</h2>
+        <p>Mfumo wa kisasa wa usajili wa washirika unaokusaidia kudumisha taarifa za washirika kwa urahisi na usalama.</p>
+        <div class="hero-actions">
+          <a href="{% url 'member-signup' %}" class="btn btn-primary">
+            📝 Sajili Mshirika Mpya
+          </a>
+          <a href="{% url 'member-directory' %}" class="btn btn-secondary">
+            📋 Ona Orodha ya Washirika
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Statistics Cards -->
+    <section class="statistics">
+      <h3>Takwimu za Ushirika</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <h4>{{ stats.total_members|default:0 }}</h4>
+            <p>Jumla ya Washirika</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🆕</div>
+          <div class="stat-content">
+            <h4>{{ stats.new_members_this_month|default:0 }}</h4>
+            <p>Washirika Wapya Mwezi Huu</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">💧</div>
+          <div class="stat-content">
+            <h4>{{ stats.baptized_members|default:0 }}</h4>
+            <p>Waliobatizwa</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🎓</div>
+          <div class="stat-content">
+            <h4>{{ stats.membership_class_completed|default:0 }}</h4>
+            <p>Waliokamilisha Darasa</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+      <h3>Huduma za Mfumo</h3>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📝</div>
+          <h4>Usajili wa Haraka</h4>
+          <p>Fomu rahisi ya usajili yenye uthibitishaji wa moja kwa moja na maelezo ya makosa.</p>
+          <a href="{% url 'member-signup' %}" class="feature-link">Sajili Sasa →</a>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h4>Utafutaji wa Kina</h4>
+          <p>Tafuta washirika kwa jina, namba ya simu, au taarifa nyingine yoyote.</p>
+          <a href="{% url 'member-directory' %}" class="feature-link">Tafuta →</a>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h4>Takwimu za Kina</h4>
+          <p>Ona takwimu za washirika, makundi ya umri, na taarifa za kiroho.</p>
+          <a href="{% url 'member-directory' %}" class="feature-link">Ona Takwimu →</a>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h4>Mfumo wa Simu</h4>
+          <p>Mfumo unaofanya kazi vizuri kwenye simu, kompyuta ndogo na kompyuta kubwa.</p>
+          <a href="#" class="feature-link">Jifunze Zaidi →</a>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h4>Usalama wa Hali ya Juu</h4>
+          <p>Taarifa za washirika zinachukuliwa kwa uangalifu mkubwa na usalama wa hali ya juu.</p>
+          <a href="#" class="feature-link">Sera ya Faragha →</a>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📄</div>
+          <h4>Uhamishaji wa Taarifa</h4>
+          <p>Hamisha orodha ya washirika katika mfumo wa CSV kwa matumizi mengine.</p>
+          <a href="{% url 'member-directory' %}" class="feature-link">Hamisha →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+      <h3>Vitendo vya Haraka</h3>
+      <div class="actions-grid">
+        <a href="{% url 'member-signup' %}" class="action-card">
+          <div class="action-icon">➕</div>
+          <div class="action-content">
+            <h4>Ongeza Mshirika</h4>
+            <p>Sajili mshirika mpya</p>
+          </div>
+        </a>
+        
+        <a href="{% url 'member-directory' %}" class="action-card">
+          <div class="action-icon">👀</div>
+          <div class="action-content">
+            <h4>Ona Washirika</h4>
+            <p>Angalia orodha kamili</p>
+          </div>
+        </a>
+        
+        <a href="/admin/" class="action-card">
+          <div class="action-icon">⚙️</div>
+          <div class="action-content">
+            <h4>Utawala</h4>
+            <p>Mipangilio ya mfumo</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>Kuhusu Mfumo</h4>
+          <p>Mfumo wa kisasa wa usajili wa washirika wa kanisa unaotumia teknolojia ya Django na JavaScript.</p>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Mawasiliano</h4>
+          <p>📧 info@jbfm-arusha.com</p>
+          <p>📞 +255 123 456 789</p>
+          <p>📍 Arusha, Tanzania</p>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Viungo Muhimu</h4>
+          <ul>
+            <li><a href="{% url 'member-signup' %}">Sajili</a></li>
+            <li><a href="{% url 'member-directory' %}">Orodha</a></li>
+            <li><a href="/admin/">Utawala</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; {{ current_year|default:"2024" }} Kanisa la Biblia la Furaha na Matumaini. Haki zote zimehifadhiwa.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="{% static 'js/home.js' %}"></script>
+</body>
+</html>
