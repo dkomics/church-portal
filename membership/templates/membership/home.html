@@ -12,14 +12,40 @@
     <!-- Header -->
     <header class="header">
       <div class="logo">
-        <h1>🏛️ Mfumo wa Usajili wa Washirika</h1>
-        <p>Kanisa la Biblia la Furaha na Matumaini - Arusha</p>
+        <div class="church-logo">
+          <img src="{% static 'images/background.jpg' %}" alt="Church Logo" class="logo-image">
+        </div>
+        <div class="church-info">
+          <h1 class="church-name">JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</h1>
+          <p class="church-subtitle">Mfumo wa Usajili wa Washirika - Arusha, Tanzania</p>
+        </div>
       </div>
       <nav class="navigation">
         <a href="{% url 'home' %}" class="nav-link active">Nyumbani</a>
-        <a href="{% url 'member-signup' %}" class="nav-link">Sajili</a>
-        <a href="{% url 'member-directory' %}" class="nav-link">Orodha</a>
-        <a href="/admin/" class="nav-link">Utawala</a>
+        
+        {% if user.is_authenticated %}
+          <!-- Authenticated user menu -->
+          {% if user.profile.can_register_members %}
+            <a href="{% url 'member-signup' %}" class="nav-link">Sajili</a>
+          {% endif %}
+          
+          {% if user.profile.can_view_directory %}
+            <a href="{% url 'member-directory' %}" class="nav-link">Orodha</a>
+          {% endif %}
+          
+          {% if user.profile.role == 'admin' %}
+            <a href="{% url 'admin_dashboard' %}" class="nav-link">Utawala</a>
+          {% endif %}
+          
+          <div class="user-menu">
+            <span class="user-greeting">Karibu, {{ user.get_full_name|default:user.username }}!</span>
+            <a href="{% url 'member_profile' %}" class="nav-link">Wasifu</a>
+            <a href="{% url 'logout' %}" class="nav-link logout-link">Toka</a>
+          </div>
+        {% else %}
+          <!-- Guest user menu -->
+          <a href="{% url 'login' %}" class="nav-link login-link">Ingia</a>
+        {% endif %}
       </nav>
     </header>
 

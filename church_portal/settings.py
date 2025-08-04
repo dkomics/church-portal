@@ -20,8 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-...')
-DEBUG = False
-ALLOWED_HOSTS = ['jbfm-arusha.onrender.com']
+DEBUG = os.getenv('DEBUG', 'True').lower() in ['true', '1', 'yes']
+ALLOWED_HOSTS = ['jbfm-arusha.onrender.com', '127.0.0.1', 'localhost']
 
 # Application definition
 INSTALLED_APPS = [
@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'membership',
+    'authentication',
 ]
 
 MIDDLEWARE = [

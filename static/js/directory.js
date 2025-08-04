@@ -105,8 +105,10 @@ class MembershipDirectory {
             }
             
             const data = await response.json();
-            this.members = data;
+            // Handle paginated response from Django REST framework
+            this.members = data.results || data;
             this.filteredMembers = [...this.members];
+            this.totalCount = data.count || this.members.length;
             
             this.hideLoading();
             this.updateStatistics();
@@ -273,7 +275,7 @@ class MembershipDirectory {
                         <th data-sort="full_name" class="sortable" tabindex="0" role="columnheader">Jina Kamili</th>
                         <th data-sort="gender" class="sortable" tabindex="0" role="columnheader">Jinsia</th>
                         <th data-sort="age_category" class="sortable" tabindex="0" role="columnheader">Umri</th>
-                        <th data-sort="emergency_phone" class="sortable" tabindex="0" role="columnheader">Simu ya Dharura</th>
+                        <th data-sort="phone" class="sortable" tabindex="0" role="columnheader">Namba za Simu</th>
                         <th data-sort="membership_type" class="sortable" tabindex="0" role="columnheader">Aina ya Ushirika</th>
                         <th data-sort="registration_date" class="sortable" tabindex="0" role="columnheader">Tarehe ya Usajili</th>
                         <th role="columnheader">Vitendo</th>
@@ -286,7 +288,7 @@ class MembershipDirectory {
                             <td role="cell">${this.escapeHtml(member.full_name)}</td>
                             <td role="cell">${this.translateGender(member.gender)}</td>
                             <td role="cell">${member.age_category || '-'}</td>
-                            <td role="cell">${member.emergency_phone}</td>
+                            <td role="cell">${this.formatPhoneNumbers(member.phone, member.emergency_phone)}</td>
                             <td role="cell">${this.translateMembershipType(member.membership_type)}</td>
                             <td role="cell">${this.formatDate(member.registration_date)}</td>
                             <td role="cell">
@@ -576,6 +578,20 @@ class MembershipDirectory {
             'Returning': 'Anayerudi'
         };
         return translations[type] || type;
+    }
+
+    formatPhoneNumbers(phone, emergencyPhone) {
+        const phones = [];
+        
+        if (phone && phone.trim()) {
+            phones.push(`<div><strong>Simu:</strong> ${phone}</div>`);
+        }
+        
+        if (emergencyPhone && emergencyPhone.trim()) {
+            phones.push(`<div><strong>Dharura:</strong> ${emergencyPhone}</div>`);
+        }
+        
+        return phones.length > 0 ? phones.join('') : '-';
     }
 
     translateMembershipClass(membershipClass) {

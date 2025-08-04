@@ -1,6 +1,18 @@
+{% load static %}
 {% block extrastyle %}
 {{ block.super }}
 <style>
-  body { background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed; background-size: cover; }
+  body { 
+    background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed; 
+    background-size: cover;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  .main {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    margin: 20px;
+    padding: 20px;
+  }
 </style>
 {% endblock %}

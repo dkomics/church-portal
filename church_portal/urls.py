@@ -26,6 +26,9 @@ from membership.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    # Authentication URLs
+    path("auth/", include("authentication.urls")),
+
     # Home page
     path("", home_page, name="home"),
 

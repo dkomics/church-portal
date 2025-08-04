@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Count
 from django.http import JsonResponse
@@ -8,9 +9,12 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 import logging
 from .models import Member
 from .serializers import MemberSerializer
+from authentication.views import can_view_directory, can_register_members
+from authentication.utils import log_user_action, filter_member_fields
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -39,18 +43,23 @@ def home_page(request):
         messages.error(request, 'Hitilafu imetokea wakati wa kupakia ukurasa wa nyumbani.')
         return render(request, 'membership/home.html', {'stats': {}})
 
+@login_required
+@user_passes_test(can_register_members)
 def register_page(request):
-    """Member registration page"""
+    """Member registration page - requires secretary, pastor, or admin role"""
     return render(request, 'membership/register.html')
 
+@login_required
+@user_passes_test(can_view_directory)
 def member_directory_page(request):
-    """Member directory page"""
+    """Member directory page - requires secretary, pastor, or admin role"""
     return render(request, 'membership/directory.html')
 
 class MemberCreateView(generics.CreateAPIView):
-    """API view for creating new members"""
+    """API view for creating new members - requires authentication and proper role"""
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
+    permission_classes = [IsAuthenticated]
     
     def create(self, request, *args, **kwargs):
         try:
@@ -83,9 +92,10 @@ class MemberCreateView(generics.CreateAPIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class MemberListView(generics.ListAPIView):
-    """API view for listing members with search and filtering"""
+    """API view for listing members with search and filtering - requires authentication"""
     serializer_class = MemberSerializer
     pagination_class = MemberPagination
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         queryset = Member.objects.all()

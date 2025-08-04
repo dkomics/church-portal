@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingia - JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Church Logo and Header -->
+            <div class="login-header">
+                <div class="church-logo">
+                    <img src="{% static 'images/background.jpg' %}" alt="Church Logo" class="logo-image">
+                </div>
+                <div class="church-info">
+                    <h1 class="church-name">JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</h1>
+                    <p class="church-subtitle">Mfumo wa Usajili wa Washirika</p>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="login-form-container">
+                <h2 class="login-title">Ingia Kwenye Mfumo</h2>
+                
+                <!-- Messages -->
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" class="login-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="username" class="form-label">Jina la Mtumiaji</label>
+                        <input type="text" id="username" name="username" class="form-control" 
+                               placeholder="Ingiza jina la mtumiaji" required autofocus>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Nenosiri</label>
+                        <input type="password" id="password" name="password" class="form-control" 
+                               placeholder="Ingiza nenosiri" required>
+                    </div>
+
+                    <div class="form-group remember-me">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="remember_me" class="checkbox-input">
+                            <span class="checkbox-text">Nikumbuke</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-login">
+                        🔐 Ingia
+                    </button>
+                </form>
+
+                <!-- Additional Links -->
+                <div class="login-footer">
+                    <p class="help-text">
+                        Je, huna akaunti? Wasiliana na msimamizi wa mfumo.
+                    </p>
+                    <div class="footer-links">
+                        <a href="{% url 'home' %}" class="footer-link">← Rudi Nyumbani</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Background Pattern -->
+        <div class="background-pattern"></div>
+    </div>
+
+    <script src="{% static 'js/login.js' %}"></script>
+</body>
+</html>
