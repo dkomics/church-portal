@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashibodi ya Utawala - JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</title>
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="{% static 'images/background.jpg' %}" alt="Church Logo" class="logo-image">
+                    <div class="church-info">
+                        <h1 class="church-name">JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</h1>
+                        <p class="page-title">Dashibodi ya Utawala</p>
+                    </div>
+                </div>
+                <div class="user-info">
+                    <span class="welcome-text">Karibu, {{ user.get_full_name|default:user.username }}!</span>
+                    <a href="{% url 'logout' %}" class="logout-btn">Toka</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="dashboard-nav">
+            <a href="{% url 'home' %}" class="nav-item">🏠 Nyumbani</a>
+            <a href="{% url 'admin_dashboard' %}" class="nav-item active">📊 Dashibodi</a>
+            <a href="{% url 'user_management' %}" class="nav-item">👥 Watumiaji</a>
+            <a href="{% url 'audit_logs' %}" class="nav-item">📋 Kumbukumbu</a>
+            <a href="{% url 'member-directory' %}" class="nav-item">📋 Washirika</a>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Statistics Cards -->
+            <section class="stats-section">
+                <h2 class="section-title">Takwimu za Mfumo</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ total_users }}</h3>
+                            <p class="stat-label">Jumla ya Watumiaji</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ active_users }}</h3>
+                            <p class="stat-label">Watumiaji Hai</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ admin_count|default:0 }}</h3>
+                            <p class="stat-label">Wasimamizi</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">👨‍💼</div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ secretary_count|default:0 }}</h3>
+                            <p class="stat-label">Wakatibu</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Role Distribution -->
+            <section class="roles-section">
+                <h2 class="section-title">Mgawanyiko wa Majukumu</h2>
+                <div class="roles-grid">
+                    {% for role_name, count in role_stats.items %}
+                    <div class="role-card">
+                        <div class="role-header">
+                            <h4 class="role-name">{{ role_name }}</h4>
+                            <span class="role-count">{{ count }}</span>
+                        </div>
+                        <div class="role-bar">
+                            <div class="role-progress" style="width: {% widthratio count total_users 100 %}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="activity-section">
+                <h2 class="section-title">Shughuli za Hivi Karibuni</h2>
+                <div class="activity-list">
+                    {% for log in recent_logins %}
+                    <div class="activity-item">
+                        <div class="activity-icon">🔐</div>
+                        <div class="activity-content">
+                            <p class="activity-text">
+                                <strong>{{ log.user.get_full_name|default:log.user.username }}</strong> 
+                                aliingia mfumoni
+                            </p>
+                            <span class="activity-time">{{ log.timestamp|timesince }} zilizopita</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="no-activity">
+                        <p>Hakuna shughuli za hivi karibuni.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="actions-section">
+                <h2 class="section-title">Vitendo vya Haraka</h2>
+                <div class="actions-grid">
+                    <a href="{% url 'create_user' %}" class="action-card">
+                        <div class="action-icon">➕</div>
+                        <div class="action-content">
+                            <h4>Unda Mtumiaji</h4>
+                            <p>Ongeza mtumiaji mpya wa mfumo</p>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'user_management' %}" class="action-card">
+                        <div class="action-icon">⚙️</div>
+                        <div class="action-content">
+                            <h4>Simamia Watumiaji</h4>
+                            <p>Dhibiti akaunti za watumiaji</p>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'audit_logs' %}" class="action-card">
+                        <div class="action-icon">📋</div>
+                        <div class="action-content">
+                            <h4>Ona Kumbukumbu</h4>
+                            <p>Kagua shughuli za mfumo</p>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'member-directory' %}" class="action-card">
+                        <div class="action-icon">👥</div>
+                        <div class="action-content">
+                            <h4>Orodha ya Washirika</h4>
+                            <p>Ona na simamia washirika</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{% static 'js/admin_dashboard.js' %}"></script>
+</body>
+</html>

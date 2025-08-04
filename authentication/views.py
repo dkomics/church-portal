@@ -130,6 +130,11 @@ def admin_dashboard(request):
     
     # User role distribution
     role_stats = {}
+    admin_count = UserProfile.objects.filter(role='admin').count()
+    secretary_count = UserProfile.objects.filter(role='secretary').count()
+    pastor_count = UserProfile.objects.filter(role='pastor').count()
+    member_count = UserProfile.objects.filter(role='member').count()
+    
     for role_code, role_name in UserProfile.ROLE_CHOICES:
         count = UserProfile.objects.filter(role=role_code).count()
         role_stats[role_name] = count
@@ -139,6 +144,10 @@ def admin_dashboard(request):
         'active_users': active_users,
         'recent_logins': recent_logins,
         'role_stats': role_stats,
+        'admin_count': admin_count,
+        'secretary_count': secretary_count,
+        'pastor_count': pastor_count,
+        'member_count': member_count,
     }
     return render(request, 'authentication/admin_dashboard.html', context)
 
