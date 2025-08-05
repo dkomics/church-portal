@@ -11,16 +11,20 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
-import sentry_sdk
 import dj_database_url
+from dotenv import load_dotenv
+import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-...')
-DEBUG = os.getenv('DEBUG', 'True').lower() in ['true', '1', 'yes']
+DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
 ALLOWED_HOSTS = ['jbfm-arusha.onrender.com', '127.0.0.1', 'localhost']
 
 # Application definition
@@ -69,18 +73,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'church_portal.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-# Override with DATABASE_URL on Render
+# Use PostgreSQL on Render, SQLite for local development
 if os.getenv('DATABASE_URL'):
-    DATABASES['default'] = dj_database_url.config(
-        conn_max_age=600,
-        ssl_require=True
-    )
+    # Production database (Render PostgreSQL)
+    DATABASES = {
+        'default': dj_database_url.parse(os.getenv('DATABASE_URL'))
+    }
+else:
+    # Local development database (SQLite)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -107,9 +113,86 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Sentry Configuration
-sentry_sdk.init(
-    dsn=os.getenv('SENTRY_DSN'),
-    integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
-    send_default_pii=True,
-)
+if os.getenv('SENTRY_DSN'):
+    sentry_sdk.init(
+        dsn=os.getenv('SENTRY_DSN'),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+        send_default_pii=True,
+    )
+
+# Production Security Settings
+if not DEBUG:
+    # HTTPS Settings
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # HSTS Settings
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Security Headers
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
+    
+    # Cookie Security
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    
+    # Additional Security
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Email Configuration (for password reset, etc.)
+if os.getenv('EMAIL_HOST'):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', 'noreply@church.com')
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'authentication': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'membership': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
