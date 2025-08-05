@@ -196,3 +196,9 @@ LOGGING = {
         },
     },
 }
+
+# Django Authentication URLs
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGOUT_URL = '/auth/logout/'
