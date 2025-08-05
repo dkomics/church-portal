@@ -25,12 +25,8 @@
         
         {% if user.is_authenticated %}
           <!-- Authenticated user menu -->
-          {% if user.profile and user.profile.can_register_members %}
-            <a href="{% url 'member-signup' %}" class="nav-link">Sajili</a>
-          {% endif %}
-          {% if user.profile and user.profile.can_view_directory %}
-            <a href="{% url 'member-directory' %}" class="nav-link">Orodha</a>
-          {% endif %}
+          <a href="{% url 'member-signup' %}" class="nav-link">Sajili</a>
+          <a href="{% url 'member-directory' %}" class="nav-link">Orodha</a>
           {% if user.profile and user.profile.role == 'admin' or user.is_superuser %}
             <a href="{% url 'authentication:admin_dashboard' %}" class="nav-link">Utawala</a>
           {% endif %}

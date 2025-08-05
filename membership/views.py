@@ -67,23 +67,27 @@ def home_page(request):
 
 @login_required
 def register_page(request):
-    """Member registration page - requires secretary, pastor, or admin role"""
-    # Check permissions manually and provide better error handling
-    if not can_register_members(request.user):
-        messages.error(request, 'Samahani, huna ruhusa ya kusajili washirika. Wasiliana na msimamizi.')
-        return redirect('home')
-    
+    """Member registration page - accessible to all authenticated users"""
+    # Allow all authenticated users to access registration form
+    # This makes sense as anyone should be able to register as a member
     return render(request, 'membership/register.html')
 
 @login_required
 def member_directory_page(request):
-    """Member directory page - requires secretary, pastor, or admin role"""
-    # Check permissions manually and provide better error handling
-    if not can_view_directory(request.user):
-        messages.error(request, 'Samahani, huna ruhusa ya kuona orodha ya washirika. Wasiliana na msimamizi.')
-        return redirect('home')
+    """Member directory page - accessible to all authenticated users with role-based data filtering"""
+    # Allow all authenticated users to view directory
+    # Data filtering will be handled by the frontend based on user permissions
+    context = {
+        'user_can_view_full_details': False,
+        'user_can_export_data': False,
+    }
     
-    return render(request, 'membership/directory.html')
+    # Set permissions based on user profile
+    if hasattr(request.user, 'profile') and request.user.profile:
+        context['user_can_view_full_details'] = request.user.profile.can_view_full_details
+        context['user_can_export_data'] = request.user.profile.can_export_data
+    
+    return render(request, 'membership/directory.html', context)
 
 class MemberCreateView(generics.CreateAPIView):
     """API view for creating new members - requires authentication and proper role"""
