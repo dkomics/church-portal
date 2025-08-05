@@ -22,6 +22,7 @@ from membership.views import (
     MemberListView, member_directory_page, MemberCreateView, 
     register_page, home_page, member_statistics
 )
+from membership.test_view import minimal_test, template_test
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -40,6 +41,10 @@ urlpatterns = [
     # Front-end pages
     path("signup/", register_page, name="member-signup"),
     path("members/", member_directory_page, name="member-directory"),
+    
+    # Debug/test URLs (temporary)
+    path("test/", minimal_test, name="test-minimal"),
+    path("test-template/", template_test, name="test-template"),
 ]
 
 # Serve static files during development

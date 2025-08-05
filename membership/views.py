@@ -26,22 +26,21 @@ class MemberPagination(PageNumberPagination):
     max_page_size = 100
 
 def home_page(request):
-    """Home page with basic statistics"""
+    """Home page with basic statistics - simplified to avoid database errors"""
     try:
+        # Temporarily use static stats to isolate 500 error
         stats = {
-            'total_members': Member.objects.count(),
-            'new_members_this_month': Member.objects.filter(
-                registration_date__month=timezone.now().month,
-                registration_date__year=timezone.now().year
-            ).count(),
-            'baptized_members': Member.objects.filter(baptized='Yes').count(),
-            'membership_class_completed': Member.objects.filter(membership_class='Yes').count(),
+            'total_members': 10,  # Static value for testing
+            'new_members_this_month': 2,  # Static value for testing
+            'baptized_members': 8,  # Static value for testing
+            'membership_class_completed': 6,  # Static value for testing
         }
         return render(request, 'membership/home.html', {'stats': stats})
     except Exception as e:
         logger.error(f"Error loading home page: {str(e)}")
-        messages.error(request, 'Hitilafu imetokea wakati wa kupakia ukurasa wa nyumbani.')
-        return render(request, 'membership/home.html', {'stats': {}})
+        # Return minimal response to isolate the issue
+        from django.http import HttpResponse
+        return HttpResponse(f"<h1>Church Portal - Debugging Mode</h1><p>Error: {str(e)}</p><p>Site is being fixed...</p>")
 
 @login_required
 @user_passes_test(can_register_members)
