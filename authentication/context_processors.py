@@ -19,10 +19,10 @@ def user_profile_context(request):
             context.update({
                 'user_profile': profile,
                 'user_role': profile.role,
-                'can_register_members': profile.can_register_members(),
-                'can_view_directory': profile.can_view_directory(),
-                'can_manage_users': profile.can_manage_users(),
-                'is_admin': profile.is_admin(),
+                'can_register_members': profile.can_register_members,
+                'can_view_directory': profile.can_view_directory,
+                'can_manage_users': getattr(profile, 'can_manage_users', False),
+                'is_admin': profile.role == 'admin',
             })
             
         except Exception as e:
