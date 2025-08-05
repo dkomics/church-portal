@@ -8,8 +8,9 @@ pip install -r requirements.txt
 # Collect static files
 python manage.py collectstatic --no-input
 
-# Run database migrations
-python manage.py migrate
+# Run database migrations with conflict resolution
+echo "Running database migrations safely..."
+python manage.py safe_migrate
 
 # Create superuser if it doesn't exist (for production)
 python manage.py shell << EOF
