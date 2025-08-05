@@ -1,0 +1,200 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wasifu Wangu - JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+    <div class="profile-container">
+        <!-- Header -->
+        <header class="profile-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="{% static 'images/background.jpg' %}" alt="Church Logo" class="logo-image">
+                    <div class="church-info">
+                        <h1 class="church-name">JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</h1>
+                        <p class="page-title">Wasifu Wangu</p>
+                    </div>
+                </div>
+                <div class="user-info">
+                    <span class="welcome-text">Karibu, {{ user.get_full_name|default:user.username }}!</span>
+                    <a href="{% url 'logout' %}" class="logout-btn">Toka</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="profile-nav">
+            <a href="{% url 'home' %}" class="nav-item">🏠 Nyumbani</a>
+            <a href="{% url 'member_profile' %}" class="nav-item active">👤 Wasifu</a>
+            {% if user.profile.can_view_directory %}
+                <a href="{% url 'member-directory' %}" class="nav-item">📋 Washirika</a>
+            {% endif %}
+            {% if user.profile.role == 'admin' %}
+                <a href="{% url 'admin_dashboard' %}" class="nav-item">📊 Utawala</a>
+            {% endif %}
+        </nav>
+
+        <!-- Main Content -->
+        <main class="profile-main">
+            <!-- Messages -->
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Profile Information -->
+            <section class="profile-section">
+                <h2 class="section-title">Taarifa za Kibinafsi</h2>
+                
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <div class="avatar-circle">
+                            {{ user.get_full_name|default:user.username|first|upper }}
+                        </div>
+                    </div>
+                    
+                    <div class="profile-info">
+                        <h3 class="profile-name">{{ user.get_full_name|default:user.username }}</h3>
+                        <p class="profile-role">{{ profile.get_role_display }}</p>
+                        <p class="profile-email">{{ user.email }}</p>
+                        {% if profile.phone_number %}
+                            <p class="profile-phone">{{ profile.phone_number }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Edit Profile Form -->
+            <section class="edit-section">
+                <h2 class="section-title">Hariri Taarifa</h2>
+                
+                <form method="post" class="profile-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.first_name.id_for_label }}">Jina la Kwanza</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="error-message">{{ form.first_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.last_name.id_for_label }}">Jina la Ukoo</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="error-message">{{ form.last_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}">Barua Pepe</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="error-message">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.phone_number.id_for_label }}">Nambari ya Simu</label>
+                            {{ form.phone_number }}
+                            {% if form.phone_number.errors %}
+                                <div class="error-message">{{ form.phone_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <span class="btn-icon">💾</span>
+                            Hifadhi Mabadiliko
+                        </button>
+                        <a href="{% url 'home' %}" class="btn-secondary">
+                            <span class="btn-icon">↩️</span>
+                            Rudi Nyumbani
+                        </a>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Account Information -->
+            <section class="account-section">
+                <h2 class="section-title">Taarifa za Akaunti</h2>
+                
+                <div class="account-info">
+                    <div class="info-item">
+                        <span class="info-label">Jukumu:</span>
+                        <span class="info-value">{{ profile.get_role_display }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Akaunti Imeundwa:</span>
+                        <span class="info-value">{{ user.date_joined|date:"d M Y" }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Mwisho Kuingia:</span>
+                        <span class="info-value">
+                            {% if user.last_login %}
+                                {{ user.last_login|date:"d M Y H:i" }}
+                            {% else %}
+                                Haijawahi kuingia
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Hali ya Akaunti:</span>
+                        <span class="info-value status-{{ user.is_active|yesno:'active,inactive' }}">
+                            {{ user.is_active|yesno:"Hai,Haifanyi kazi" }}
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Permissions -->
+            {% if profile.role != 'member' %}
+            <section class="permissions-section">
+                <h2 class="section-title">Ruhusa za Mfumo</h2>
+                
+                <div class="permissions-grid">
+                    <div class="permission-item {{ profile.can_register_members|yesno:'granted,denied' }}">
+                        <span class="permission-icon">{{ profile.can_register_members|yesno:'✅,❌' }}</span>
+                        <span class="permission-text">Sajili Washirika</span>
+                    </div>
+                    
+                    <div class="permission-item {{ profile.can_view_directory|yesno:'granted,denied' }}">
+                        <span class="permission-icon">{{ profile.can_view_directory|yesno:'✅,❌' }}</span>
+                        <span class="permission-text">Ona Orodha ya Washirika</span>
+                    </div>
+                    
+                    <div class="permission-item {{ profile.can_manage_users|yesno:'granted,denied' }}">
+                        <span class="permission-icon">{{ profile.can_manage_users|yesno:'✅,❌' }}</span>
+                        <span class="permission-text">Simamia Watumiaji</span>
+                    </div>
+                    
+                    <div class="permission-item {{ profile.can_view_reports|yesno:'granted,denied' }}">
+                        <span class="permission-icon">{{ profile.can_view_reports|yesno:'✅,❌' }}</span>
+                        <span class="permission-text">Ona Ripoti</span>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </main>
+    </div>
+
+    <script src="{% static 'js/profile.js' %}"></script>
+</body>
+</html>
