@@ -1,18 +1,87 @@
+{% extends "admin/base.html" %}
 {% load static %}
+
+{% block title %}{{ title }} | Church Portal Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Church Portal Administration</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
 {% block extrastyle %}
 {{ block.super }}
 <style>
-  body { 
-    background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed; 
-    background-size: cover;
-    background-attachment: fixed;
-    min-height: 100vh;
+  /* Custom admin styling that doesn't break functionality */
+  #header {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    border-bottom: 3px solid #e74c3c;
   }
-  .main {
-    background: rgba(255, 255, 255, 0.95);
+  
+  #site-name a {
+    color: #ffffff;
+    font-weight: 600;
+  }
+  
+  #site-name a:hover {
+    color: #ecf0f1;
+  }
+  
+  .breadcrumbs {
+    background: #34495e;
+  }
+  
+  .breadcrumbs a {
+    color: #3498db;
+  }
+  
+  /* Subtle background for main content area only */
+  #content {
+    background: rgba(255, 255, 255, 0.98);
     border-radius: 8px;
-    margin: 20px;
+    margin: 10px;
     padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  /* Keep sidebar functional */
+  #nav-sidebar {
+    background: #2c3e50;
+  }
+  
+  #nav-sidebar a {
+    color: #ecf0f1;
+  }
+  
+  #nav-sidebar a:hover {
+    background: #34495e;
+  }
+  
+  /* Style buttons */
+  .button, input[type=submit], input[type=button], .submit-row input {
+    background: #3498db;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background: #2980b9;
+  }
+  
+  /* Style tables */
+  .results table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .results th {
+    background: #34495e;
+    color: white;
+  }
+  
+  .results tr:nth-child(even) {
+    background: #f8f9fa;
   }
 </style>
 {% endblock %}
