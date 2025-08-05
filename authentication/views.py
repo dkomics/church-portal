@@ -63,19 +63,25 @@ def user_login(request):
     return render(request, 'authentication/login.html')
 
 
-@login_required
 def user_logout(request):
     """Handle user logout with audit logging"""
-    # Log logout action
-    log_user_action(
-        user=request.user,
-        action='logout',
-        request=request
-    )
+    # Only log if user is authenticated
+    if request.user.is_authenticated:
+        try:
+            log_user_action(
+                user=request.user,
+                action='logout',
+                request=request
+            )
+        except Exception as e:
+            # Log error but don't fail logout
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error logging logout action: {str(e)}")
     
     logout(request)
     messages.success(request, 'Umetoka kikamilifu. Asante!')
-    return redirect('login')
+    return redirect('authentication:login')
 
 
 @login_required
