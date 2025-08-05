@@ -8,20 +8,67 @@ pip install -r requirements.txt
 # Collect static files
 python manage.py collectstatic --no-input
 
-# Handle migration conflicts directly
-echo "Running database migrations with conflict resolution..."
+# Handle migration conflicts with comprehensive database state check
+echo "Running database migrations with comprehensive conflict resolution..."
 
-# Try to fake the problematic migration first
-echo "Attempting to resolve age_category column conflict..."
-python manage.py migrate membership 0002 --fake || echo "Migration 0002 fake failed, continuing..."
+# Create a custom migration script to handle the specific conflicts
+python manage.py shell << 'MIGRATION_EOF'
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'church_portal.settings')
 
-# Run remaining migrations
-echo "Running remaining migrations..."
-python manage.py migrate || {
-    echo "Normal migration failed, trying --fake-initial..."
-    python manage.py migrate --fake-initial
-    python manage.py migrate
-}
+import django
+django.setup()
+
+from django.db import connection
+from django.core.management import call_command
+from django.db.utils import ProgrammingError
+
+print("Checking database state...")
+
+# Check what columns actually exist
+with connection.cursor() as cursor:
+    try:
+        cursor.execute("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'membership_member'
+            AND column_name IN ('age_category', 'membership_id');
+        """)
+        existing_columns = [row[0] for row in cursor.fetchall()]
+        print(f"Existing columns: {existing_columns}")
+        
+        has_age_category = 'age_category' in existing_columns
+        has_membership_id = 'membership_id' in existing_columns
+        
+        print(f"Has age_category: {has_age_category}")
+        print(f"Has membership_id: {has_membership_id}")
+        
+        if has_age_category and not has_membership_id:
+            print("Detected partial migration 0002 - age_category exists but membership_id missing")
+            print("Adding missing membership_id column...")
+            cursor.execute("""
+                ALTER TABLE membership_member 
+                ADD COLUMN membership_id VARCHAR(8) NULL UNIQUE;
+            """)
+            print("membership_id column added successfully")
+            
+        elif has_age_category and has_membership_id:
+            print("Both columns exist - marking migration 0002 as fake")
+            call_command('migrate', 'membership', '0002', '--fake')
+            
+        elif not has_age_category and not has_membership_id:
+            print("No columns exist - running normal migration")
+            
+    except Exception as e:
+        print(f"Error checking database state: {e}")
+        print("Proceeding with fallback migration strategy...")
+
+print("Database state check completed")
+MIGRATION_EOF
+
+# Now run migrations normally
+echo "Running migrations after state resolution..."
+python manage.py migrate
 
 # Create superuser if it doesn't exist (for production)
 python manage.py shell << EOF
