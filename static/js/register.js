@@ -8,9 +8,30 @@ class MembershipForm {
         this.submitButton = document.querySelector('button[type="submit"]');
         this.formError = document.getElementById('formError');
         
+        // Debug logging
+        console.log('Form elements found:', {
+            form: !!this.form,
+            progressBar: !!this.progressBar,
+            progressText: !!this.progressText,
+            submitButton: !!this.submitButton,
+            formError: !!this.formError
+        });
+        
+        if (!this.form) {
+            console.error('Registration form not found!');
+            return;
+        }
+        
+        if (!this.submitButton) {
+            console.error('Submit button not found!');
+            return;
+        }
+        
         this.totalFields = this.form.querySelectorAll('input[required], select[required]').length;
         this.currentStep = 1;
         this.maxSteps = 4;
+        
+        console.log(`Found ${this.totalFields} required fields`);
         
         this.init();
     }
@@ -218,19 +239,25 @@ class MembershipForm {
     }
 
     async handleSubmit(event) {
+        console.log('Form submission started');
         event.preventDefault();
         
         // Clear previous errors
         this.clearAllErrors();
         
         // Validate all fields
+        console.log('Validating form fields...');
         const isValid = this.validateAllFields();
+        console.log('Form validation result:', isValid);
+        
         if (!isValid) {
+            console.log('Form validation failed');
             this.showFormError('Tafadhali sahihisha makosa yaliyoonyeshwa.');
             return;
         }
 
         // Show loading state
+        console.log('Setting loading state...');
         this.setLoadingState(true);
 
         const formData = new FormData(this.form);
@@ -238,28 +265,56 @@ class MembershipForm {
         formData.forEach((value, key) => {
             data[key] = value;
         });
+        
+        console.log('Form data to submit:', data);
+        
+        // Get CSRF token
+        const csrfToken = this.getCookie('csrftoken');
+        console.log('CSRF token found:', !!csrfToken);
+        
+        if (!csrfToken) {
+            console.error('CSRF token not found!');
+            this.showFormError('Hitilafu ya usalama. Tafadhali upakue ukurasa tena.');
+            this.setLoadingState(false);
+            return;
+        }
 
         try {
+            console.log('Sending request to /api/register/');
             const response = await fetch("/api/register/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRFToken": this.getCookie('csrftoken')
+                    "X-CSRFToken": csrfToken
                 },
                 body: JSON.stringify(data),
             });
+            
+            console.log('Response received:', {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok
+            });
 
             if (response.ok) {
+                console.log('Registration successful!');
+                const result = await response.json();
+                console.log('Success response:', result);
                 this.handleSuccess();
             } else if (response.status >= 500) {
+                console.error('Server error:', response.status);
                 this.showFormError('Hitilafu ya server. Tafadhali jaribu tena.');
             } else {
+                console.log('Validation errors from server');
                 const errors = await response.json();
+                console.log('Server errors:', errors);
                 this.handleValidationErrors(errors);
             }
         } catch (error) {
+            console.error('Network error:', error);
             this.showFormError('Mtandao umeshindwa: ' + error.message);
         } finally {
+            console.log('Setting loading state to false');
             this.setLoadingState(false);
         }
     }
