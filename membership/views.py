@@ -66,15 +66,23 @@ def home_page(request):
     return render(request, 'membership/home.html', context)
 
 @login_required
-@user_passes_test(can_register_members)
 def register_page(request):
     """Member registration page - requires secretary, pastor, or admin role"""
+    # Check permissions manually and provide better error handling
+    if not can_register_members(request.user):
+        messages.error(request, 'Samahani, huna ruhusa ya kusajili washirika. Wasiliana na msimamizi.')
+        return redirect('home')
+    
     return render(request, 'membership/register.html')
 
 @login_required
-@user_passes_test(can_view_directory)
 def member_directory_page(request):
     """Member directory page - requires secretary, pastor, or admin role"""
+    # Check permissions manually and provide better error handling
+    if not can_view_directory(request.user):
+        messages.error(request, 'Samahani, huna ruhusa ya kuona orodha ya washirika. Wasiliana na msimamizi.')
+        return redirect('home')
+    
     return render(request, 'membership/directory.html')
 
 class MemberCreateView(generics.CreateAPIView):

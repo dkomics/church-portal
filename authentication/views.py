@@ -48,11 +48,11 @@ def user_login(request):
                 
                 if hasattr(user, 'profile'):
                     if user.profile.role == 'admin':
-                        return redirect('admin_dashboard')
+                        return redirect('authentication:admin_dashboard')
                     elif user.profile.role in ['pastor', 'secretary']:
                         return redirect('member-directory')
                     else:
-                        return redirect('member_profile')
+                        return redirect('authentication:member_profile')
                 else:
                     return redirect('home')
             else:
