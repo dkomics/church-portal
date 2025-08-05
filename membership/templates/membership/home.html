@@ -25,26 +25,26 @@
         
         {% if user.is_authenticated %}
           <!-- Authenticated user menu -->
-          {% if user.profile.can_register_members %}
+          {% if can_register_members %}
             <a href="{% url 'member-signup' %}" class="nav-link">Sajili</a>
           {% endif %}
           
-          {% if user.profile.can_view_directory %}
+          {% if can_view_directory %}
             <a href="{% url 'member-directory' %}" class="nav-link">Orodha</a>
           {% endif %}
           
-          {% if user.profile.role == 'admin' %}
-            <a href="{% url 'admin_dashboard' %}" class="nav-link">Utawala</a>
+          {% if is_admin %}
+            <a href="{% url 'authentication:admin_dashboard' %}" class="nav-link">Utawala</a>
           {% endif %}
           
           <div class="user-menu">
             <span class="user-greeting">Karibu, {{ user.get_full_name|default:user.username }}!</span>
-            <a href="{% url 'member_profile' %}" class="nav-link">Wasifu</a>
-            <a href="{% url 'logout' %}" class="nav-link logout-link">Toka</a>
+            <a href="{% url 'authentication:member_profile' %}" class="nav-link">Wasifu</a>
+            <a href="{% url 'authentication:logout' %}" class="nav-link logout-link">Toka</a>
           </div>
         {% else %}
           <!-- Guest user menu -->
-          <a href="{% url 'login' %}" class="nav-link login-link">Ingia</a>
+          <a href="{% url 'authentication:login' %}" class="nav-link login-link">Ingia</a>
         {% endif %}
       </nav>
     </header>
@@ -111,14 +111,30 @@
           <div class="feature-icon">📝</div>
           <h4>Usajili wa Haraka</h4>
           <p>Fomu rahisi ya usajili yenye uthibitishaji wa moja kwa moja na maelezo ya makosa.</p>
-          <a href="{% url 'member-signup' %}" class="feature-link">Sajili Sasa →</a>
+          {% if user.is_authenticated %}
+            {% if can_register_members %}
+              <a href="{% url 'member-signup' %}" class="feature-link">Sajili Mshirika Mpya →</a>
+            {% else %}
+              <span class="feature-link disabled" title="Unahitaji ruhusa za katibu, mchungaji au msimamizi">🔒 Ruhusa Zinahitajika</span>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'authentication:login' %}" class="feature-link">🔑 Ingia Kwanza →</a>
+          {% endif %}
         </div>
         
         <div class="feature-card">
           <div class="feature-icon">🔍</div>
           <h4>Utafutaji wa Kina</h4>
           <p>Tafuta washirika kwa jina, namba ya simu, au taarifa nyingine yoyote.</p>
-          <a href="{% url 'member-directory' %}" class="feature-link">Tafuta →</a>
+          {% if user.is_authenticated %}
+            {% if can_view_directory %}
+              <a href="{% url 'member-directory' %}" class="feature-link">Fungua Orodha →</a>
+            {% else %}
+              <span class="feature-link disabled" title="Unahitaji ruhusa za katibu, mchungaji au msimamizi">🔒 Ruhusa Zinahitajika</span>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'authentication:login' %}" class="feature-link">🔑 Ingia Kwanza →</a>
+          {% endif %}
         </div>
         
         <div class="feature-card">
