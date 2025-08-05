@@ -26,21 +26,44 @@ class MemberPagination(PageNumberPagination):
     max_page_size = 100
 
 def home_page(request):
-    """Home page with basic statistics - simplified to avoid database errors"""
-    try:
-        # Temporarily use static stats to isolate 500 error
-        stats = {
-            'total_members': 10,  # Static value for testing
-            'new_members_this_month': 2,  # Static value for testing
-            'baptized_members': 8,  # Static value for testing
-            'membership_class_completed': 6,  # Static value for testing
+    """Home page with basic statistics and robust error handling"""
+    context = {
+        'stats': {
+            'total_members': 0,
+            'new_members_this_month': 0,
+            'baptized_members': 0,
+            'membership_class_completed': 0,
         }
-        return render(request, 'membership/home.html', {'stats': stats})
+    }
+    
+    try:
+        # Try to get real statistics from database
+        from django.db.models import Count
+        from datetime import datetime, timedelta
+        
+        # Get current month for filtering
+        current_month = datetime.now().replace(day=1)
+        
+        # Calculate statistics safely
+        context['stats'] = {
+            'total_members': Member.objects.count(),
+            'new_members_this_month': Member.objects.filter(
+                registration_date__gte=current_month
+            ).count(),
+            'baptized_members': Member.objects.filter(
+                baptism_status='baptized'
+            ).count(),
+            'membership_class_completed': Member.objects.filter(
+                membership_class_completed=True
+            ).count(),
+        }
     except Exception as e:
-        logger.error(f"Error loading home page: {str(e)}")
-        # Return minimal response to isolate the issue
-        from django.http import HttpResponse
-        return HttpResponse(f"<h1>Church Portal - Debugging Mode</h1><p>Error: {str(e)}</p><p>Site is being fixed...</p>")
+        # Log error but continue with default values
+        logger.error(f"Error calculating statistics: {str(e)}")
+        # Keep default stats from context initialization
+        pass
+    
+    return render(request, 'membership/home.html', context)
 
 @login_required
 @user_passes_test(can_register_members)
