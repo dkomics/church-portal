@@ -2,13 +2,13 @@ services:
   - type: web
     name: church-portal
     env: python
-    buildCommand: "./build.sh"
+    buildCommand: "chmod +x build.sh && ./build.sh"
     startCommand: "gunicorn church_portal.wsgi:application"
     plan: starter
     healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.11
+        value: 3.13.4
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DEBUG

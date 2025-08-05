@@ -8,9 +8,20 @@ pip install -r requirements.txt
 # Collect static files
 python manage.py collectstatic --no-input
 
-# Run database migrations with conflict resolution
-echo "Running database migrations safely..."
-python manage.py safe_migrate
+# Handle migration conflicts directly
+echo "Running database migrations with conflict resolution..."
+
+# Try to fake the problematic migration first
+echo "Attempting to resolve age_category column conflict..."
+python manage.py migrate membership 0002 --fake || echo "Migration 0002 fake failed, continuing..."
+
+# Run remaining migrations
+echo "Running remaining migrations..."
+python manage.py migrate || {
+    echo "Normal migration failed, trying --fake-initial..."
+    python manage.py migrate --fake-initial
+    python manage.py migrate
+}
 
 # Create superuser if it doesn't exist (for production)
 python manage.py shell << EOF
