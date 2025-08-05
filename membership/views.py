@@ -65,11 +65,10 @@ def home_page(request):
     
     return render(request, 'membership/home.html', context)
 
-@login_required
 def register_page(request):
-    """Member registration page - accessible to all authenticated users"""
-    # Allow all authenticated users to access registration form
-    # This makes sense as anyone should be able to register as a member
+    """Member registration page - accessible to all users for new member registration"""
+    # Allow all users (authenticated and unauthenticated) to access registration form
+    # This makes sense as new members need to register without having accounts yet
     return render(request, 'membership/register.html')
 
 @login_required
@@ -90,10 +89,10 @@ def member_directory_page(request):
     return render(request, 'membership/directory.html', context)
 
 class MemberCreateView(generics.CreateAPIView):
-    """API view for creating new members - requires authentication and proper role"""
+    """API view for creating new members - accessible to all users for new member registration"""
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = []  # Remove authentication requirement to allow new members to register
     
     def create(self, request, *args, **kwargs):
         try:
