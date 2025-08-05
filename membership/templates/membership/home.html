@@ -25,15 +25,9 @@
         
         {% if user.is_authenticated %}
           <!-- Authenticated user menu -->
-          {% if can_register_members %}
-            <a href="{% url 'member-signup' %}" class="nav-link">Sajili</a>
-          {% endif %}
-          
-          {% if can_view_directory %}
-            <a href="{% url 'member-directory' %}" class="nav-link">Orodha</a>
-          {% endif %}
-          
-          {% if is_admin %}
+          <a href="{% url 'member-signup' %}" class="nav-link">Sajili</a>
+          <a href="{% url 'member-directory' %}" class="nav-link">Orodha</a>
+          {% if user.is_superuser %}
             <a href="{% url 'authentication:admin_dashboard' %}" class="nav-link">Utawala</a>
           {% endif %}
           
@@ -112,11 +106,7 @@
           <h4>Usajili wa Haraka</h4>
           <p>Fomu rahisi ya usajili yenye uthibitishaji wa moja kwa moja na maelezo ya makosa.</p>
           {% if user.is_authenticated %}
-            {% if can_register_members %}
-              <a href="{% url 'member-signup' %}" class="feature-link">Sajili Mshirika Mpya →</a>
-            {% else %}
-              <span class="feature-link disabled" title="Unahitaji ruhusa za katibu, mchungaji au msimamizi">🔒 Ruhusa Zinahitajika</span>
-            {% endif %}
+            <a href="{% url 'member-signup' %}" class="feature-link">Sajili Mshirika Mpya →</a>
           {% else %}
             <a href="{% url 'authentication:login' %}" class="feature-link">🔑 Ingia Kwanza →</a>
           {% endif %}
@@ -127,11 +117,7 @@
           <h4>Utafutaji wa Kina</h4>
           <p>Tafuta washirika kwa jina, namba ya simu, au taarifa nyingine yoyote.</p>
           {% if user.is_authenticated %}
-            {% if can_view_directory %}
-              <a href="{% url 'member-directory' %}" class="feature-link">Fungua Orodha →</a>
-            {% else %}
-              <span class="feature-link disabled" title="Unahitaji ruhusa za katibu, mchungaji au msimamizi">🔒 Ruhusa Zinahitajika</span>
-            {% endif %}
+            <a href="{% url 'member-directory' %}" class="feature-link">Fungua Orodha →</a>
           {% else %}
             <a href="{% url 'authentication:login' %}" class="feature-link">🔑 Ingia Kwanza →</a>
           {% endif %}
