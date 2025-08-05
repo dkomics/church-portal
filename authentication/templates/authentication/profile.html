@@ -21,7 +21,7 @@
                 </div>
                 <div class="user-info">
                     <span class="welcome-text">Karibu, {{ user.get_full_name|default:user.username }}!</span>
-                    <a href="{% url 'logout' %}" class="logout-btn">Toka</a>
+                    <a href="{% url 'authentication:logout' %}" class="logout-btn">Toka</a>
                 </div>
             </div>
         </header>
@@ -29,12 +29,12 @@
         <!-- Navigation -->
         <nav class="profile-nav">
             <a href="{% url 'home' %}" class="nav-item">🏠 Nyumbani</a>
-            <a href="{% url 'member_profile' %}" class="nav-item active">👤 Wasifu</a>
+            <a href="{% url 'authentication:member_profile' %}" class="nav-item active">👤 Wasifu</a>
             {% if user.profile.can_view_directory %}
                 <a href="{% url 'member-directory' %}" class="nav-item">📋 Washirika</a>
             {% endif %}
             {% if user.profile.role == 'admin' %}
-                <a href="{% url 'admin_dashboard' %}" class="nav-item">📊 Utawala</a>
+                <a href="{% url 'authentication:admin_dashboard' %}" class="nav-item">📊 Utawala</a>
             {% endif %}
         </nav>
 

@@ -1,0 +1,165 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unda Mtumiaji - JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</title>
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="{% static 'images/background.jpg' %}" alt="Church Logo" class="logo-image">
+                    <div class="church-info">
+                        <h1 class="church-name">JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</h1>
+                        <p class="page-title">Unda Mtumiaji Mpya</p>
+                    </div>
+                </div>
+                <div class="user-info">
+                    <span class="welcome-text">Karibu, {{ user.get_full_name|default:user.username }}!</span>
+                    <a href="{% url 'authentication:logout' %}" class="logout-btn">Toka</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="dashboard-nav">
+            <a href="{% url 'home' %}" class="nav-item">🏠 Nyumbani</a>
+            <a href="{% url 'authentication:admin_dashboard' %}" class="nav-item">📊 Dashibodi</a>
+            <a href="{% url 'authentication:user_management' %}" class="nav-item">👥 Watumiaji</a>
+            <a href="{% url 'authentication:audit_logs' %}" class="nav-item">📋 Kumbukumbu</a>
+            <a href="{% url 'member-directory' %}" class="nav-item">📋 Washirika</a>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Messages -->
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Create User Form -->
+            <section class="form-section">
+                <div class="section-header">
+                    <h2 class="section-title">Unda Mtumiaji Mpya</h2>
+                    <a href="{% url 'authentication:user_management' %}" class="btn btn-secondary">← Rudi Nyuma</a>
+                </div>
+
+                <div class="form-container">
+                    <form method="post" class="user-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">Jina la Mtumiaji *</label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="error-message">{{ form.username.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Barua Pepe</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="error-message">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">Jina la Kwanza</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="error-message">{{ form.first_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">Jina la Mwisho</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="error-message">{{ form.last_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label">Nenosiri *</label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                    <div class="error-message">{{ form.password1.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">Thibitisha Nenosiri *</label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                    <div class="error-message">{{ form.password2.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.role.id_for_label }}" class="form-label">Jukumu *</label>
+                                {{ form.role }}
+                                {% if form.role.errors %}
+                                    <div class="error-message">{{ form.role.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label">Namba ya Simu</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                    <div class="error-message">{{ form.phone.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">✓ Unda Mtumiaji</button>
+                            <a href="{% url 'authentication:user_management' %}" class="btn btn-secondary">Ghairi</a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Help Section -->
+                <div class="help-section">
+                    <h3>Maelezo ya Majukumu</h3>
+                    <div class="role-descriptions">
+                        <div class="role-item">
+                            <strong>Mshirika:</strong> Anaweza kuona taarifa zake tu na kusajili kama mshirika.
+                        </div>
+                        <div class="role-item">
+                            <strong>Katibu:</strong> Anaweza kusajili washirika wengine na kuona orodha ya washirika.
+                        </div>
+                        <div class="role-item">
+                            <strong>Mchungaji:</strong> Ana mamlaka ya katibu na anaweza kuona takwimu za kanisa.
+                        </div>
+                        <div class="role-item">
+                            <strong>Msimamizi:</strong> Ana mamlaka yote ya mfumo ikiwa ni pamoja na usimamizi wa watumiaji.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{% static 'js/admin_dashboard.js' %}"></script>
+</body>
+</html>

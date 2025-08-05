@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kumbukumbu za Ufuatiliaji - JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</title>
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="{% static 'images/background.jpg' %}" alt="Church Logo" class="logo-image">
+                    <div class="church-info">
+                        <h1 class="church-name">JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</h1>
+                        <p class="page-title">Kumbukumbu za Ufuatiliaji</p>
+                    </div>
+                </div>
+                <div class="user-info">
+                    <span class="welcome-text">Karibu, {{ user.get_full_name|default:user.username }}!</span>
+                    <a href="{% url 'authentication:logout' %}" class="logout-btn">Toka</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="dashboard-nav">
+            <a href="{% url 'home' %}" class="nav-item">🏠 Nyumbani</a>
+            <a href="{% url 'authentication:admin_dashboard' %}" class="nav-item">📊 Dashibodi</a>
+            <a href="{% url 'authentication:user_management' %}" class="nav-item">👥 Watumiaji</a>
+            <a href="{% url 'authentication:audit_logs' %}" class="nav-item active">📋 Kumbukumbu</a>
+            <a href="{% url 'member-directory' %}" class="nav-item">📋 Washirika</a>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <h2 class="section-title">Chuja Kumbukumbu</h2>
+                <form method="get" class="filters-form">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="user" class="filter-label">Mtumiaji:</label>
+                            <select name="user" id="user" class="filter-select">
+                                <option value="">Wote</option>
+                                {% for user_obj in users %}
+                                    <option value="{{ user_obj.id }}" {% if request.GET.user == user_obj.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ user_obj.get_full_name|default:user_obj.username }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="action" class="filter-label">Kitendo:</label>
+                            <select name="action" id="action" class="filter-select">
+                                <option value="">Vyote</option>
+                                <option value="login" {% if request.GET.action == 'login' %}selected{% endif %}>Kuingia</option>
+                                <option value="logout" {% if request.GET.action == 'logout' %}selected{% endif %}>Kutoka</option>
+                                <option value="view_member" {% if request.GET.action == 'view_member' %}selected{% endif %}>Kuona Mshirika</option>
+                                <option value="register_member" {% if request.GET.action == 'register_member' %}selected{% endif %}>Kusajili Mshirika</option>
+                                <option value="update_member" {% if request.GET.action == 'update_member' %}selected{% endif %}>Kubadilisha Mshirika</option>
+                                <option value="export_data" {% if request.GET.action == 'export_data' %}selected{% endif %}>Kuhamisha Data</option>
+                                <option value="manage_user" {% if request.GET.action == 'manage_user' %}selected{% endif %}>Usimamizi wa Mtumiaji</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="date_from" class="filter-label">Kuanzia:</label>
+                            <input type="date" name="date_from" id="date_from" value="{{ request.GET.date_from }}" class="filter-input">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="date_to" class="filter-label">Hadi:</label>
+                            <input type="date" name="date_to" id="date_to" value="{{ request.GET.date_to }}" class="filter-input">
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <button type="submit" class="btn btn-primary">🔍 Chuja</button>
+                            <a href="{% url 'authentication:audit_logs' %}" class="btn btn-secondary">Futa</a>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Audit Logs Section -->
+            <section class="logs-section">
+                <div class="section-header">
+                    <h2 class="section-title">Kumbukumbu za Shughuli</h2>
+                    <div class="logs-info">
+                        Jumla: {{ logs.paginator.count }} kumbukumbu
+                    </div>
+                </div>
+
+                <div class="logs-table-container">
+                    <table class="logs-table">
+                        <thead>
+                            <tr>
+                                <th>Tarehe na Wakati</th>
+                                <th>Mtumiaji</th>
+                                <th>Kitendo</th>
+                                <th>Lengo</th>
+                                <th>Anwani ya IP</th>
+                                <th>Maelezo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td class="timestamp">
+                                    {{ log.timestamp|date:"d/m/Y H:i" }}
+                                </td>
+                                <td class="user">
+                                    {{ log.user.get_full_name|default:log.user.username }}
+                                </td>
+                                <td class="action">
+                                    <span class="action-badge action-{{ log.action }}">
+                                        {{ log.get_action_display }}
+                                    </span>
+                                </td>
+                                <td class="target">
+                                    {% if log.target_member_id %}
+                                        {{ log.target_member_id }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="ip">
+                                    {{ log.ip_address|default:"-" }}
+                                </td>
+                                <td class="details">
+                                    {% if log.details %}
+                                        <button class="btn btn-sm btn-link details-toggle" 
+                                                data-details="{{ log.details|safe }}">
+                                            Ona
+                                        </button>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="no-data">Hakuna kumbukumbu zilizopatikana</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if logs.has_other_pages %}
+                <div class="pagination">
+                    {% if logs.has_previous %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ logs.previous_page_number }}" class="page-link">« Nyuma</a>
+                    {% endif %}
+                    
+                    <span class="page-info">
+                        Ukurasa {{ logs.number }} wa {{ logs.paginator.num_pages }}
+                    </span>
+                    
+                    {% if logs.has_next %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ logs.next_page_number }}" class="page-link">Mbele »</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Maelezo ya Kumbukumbu</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre id="detailsContent"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/admin_dashboard.js' %}"></script>
+    <script>
+        // Handle details modal
+        document.querySelectorAll('.details-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const details = this.dataset.details;
+                const modal = document.getElementById('detailsModal');
+                const content = document.getElementById('detailsContent');
+                
+                try {
+                    const parsedDetails = JSON.parse(details);
+                    content.textContent = JSON.stringify(parsedDetails, null, 2);
+                } catch (e) {
+                    content.textContent = details;
+                }
+                
+                modal.style.display = 'block';
+            });
+        });
+
+        // Close modal
+        document.querySelector('.modal-close').addEventListener('click', function() {
+            document.getElementById('detailsModal').style.display = 'none';
+        });
+
+        // Close modal on outside click
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('detailsModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+
+    <style>
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .action-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .action-login { background-color: #d4edda; color: #155724; }
+        .action-logout { background-color: #f8d7da; color: #721c24; }
+        .action-view_member { background-color: #d1ecf1; color: #0c5460; }
+        .action-register_member { background-color: #d4edda; color: #155724; }
+        .action-update_member { background-color: #fff3cd; color: #856404; }
+        .action-export_data { background-color: #e2e3e5; color: #383d41; }
+        .action-manage_user { background-color: #f4cccc; color: #5f2120; }
+    </style>
+</body>
+</html>
