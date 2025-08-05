@@ -52,9 +52,42 @@ with connection.cursor() as cursor:
             """)
             print("membership_id column added successfully")
             
+            # Check if indexes already exist and fake migration 0003 if needed
+            cursor.execute("""
+                SELECT indexname FROM pg_indexes 
+                WHERE tablename = 'membership_member' 
+                AND indexname LIKE '%members_%_idx';
+            """)
+            existing_indexes = [row[0] for row in cursor.fetchall()]
+            
+            if existing_indexes:
+                print(f"Found existing indexes: {existing_indexes}")
+                print("Marking migration 0003 as fake to avoid index conflicts...")
+                call_command('migrate', 'membership', '0002', '--fake')
+                call_command('migrate', 'membership', '0003', '--fake')
+            else:
+                print("No conflicting indexes found")
+                call_command('migrate', 'membership', '0002', '--fake')
+            
         elif has_age_category and has_membership_id:
-            print("Both columns exist - marking migration 0002 as fake")
-            call_command('migrate', 'membership', '0002', '--fake')
+            print("Both columns exist - checking for index conflicts")
+            
+            # Check for existing indexes
+            cursor.execute("""
+                SELECT indexname FROM pg_indexes 
+                WHERE tablename = 'membership_member' 
+                AND indexname LIKE '%members_%_idx';
+            """)
+            existing_indexes = [row[0] for row in cursor.fetchall()]
+            
+            if existing_indexes:
+                print(f"Found existing indexes: {existing_indexes}")
+                print("Marking migrations 0002 and 0003 as fake")
+                call_command('migrate', 'membership', '0002', '--fake')
+                call_command('migrate', 'membership', '0003', '--fake')
+            else:
+                print("No index conflicts - marking migration 0002 as fake")
+                call_command('migrate', 'membership', '0002', '--fake')
             
         elif not has_age_category and not has_membership_id:
             print("No columns exist - running normal migration")
