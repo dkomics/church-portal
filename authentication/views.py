@@ -81,7 +81,11 @@ def user_logout(request):
 @login_required
 def member_profile(request):
     """Display and allow editing of user's own profile"""
-    profile = request.user.profile
+    # Get or create profile to handle cases where profile doesn't exist
+    profile, created = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'role': 'member'}
+    )
     
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=profile)
@@ -258,9 +262,14 @@ def update_user_role(request, user_id):
         new_role = request.POST.get('role')
         
         if new_role in dict(UserProfile.ROLE_CHOICES):
-            old_role = user.profile.role
-            user.profile.role = new_role
-            user.profile.save()
+            # Get or create profile to handle cases where profile doesn't exist
+            profile, created = UserProfile.objects.get_or_create(
+                user=user,
+                defaults={'role': 'member'}
+            )
+            old_role = profile.role
+            profile.role = new_role
+            profile.save()
             
             # Log action
             log_user_action(
@@ -277,7 +286,7 @@ def update_user_role(request, user_id):
             
             return JsonResponse({
                 'success': True,
-                'new_role': user.profile.get_role_display(),
+                'new_role': profile.get_role_display(),
                 'message': f'Jukumu la mtumiaji {user.username} limebadilishwa.'
             })
         else:
