@@ -268,8 +268,8 @@ class MembershipForm {
         
         console.log('Form data to submit:', data);
         
-        // Get CSRF token
-        const csrfToken = this.getCookie('csrftoken');
+        // Get CSRF token (try form field first, then cookie)
+        let csrfToken = this.getCSRFToken();
         console.log('CSRF token found:', !!csrfToken);
         
         if (!csrfToken) {
@@ -433,6 +433,25 @@ class MembershipForm {
     }
 
     // Utility functions
+    getCSRFToken() {
+        // First try to get CSRF token from the form's hidden input field
+        const csrfInput = this.form.querySelector('input[name="csrfmiddlewaretoken"]');
+        if (csrfInput && csrfInput.value) {
+            console.log('CSRF token found in form field');
+            return csrfInput.value;
+        }
+        
+        // Fallback to cookie method (for authenticated users)
+        const cookieToken = this.getCookie('csrftoken');
+        if (cookieToken) {
+            console.log('CSRF token found in cookie');
+            return cookieToken;
+        }
+        
+        console.log('No CSRF token found in form field or cookie');
+        return null;
+    }
+    
     getCookie(name) {
         const value = "; " + document.cookie;
         const parts = value.split("; " + name + "=");
