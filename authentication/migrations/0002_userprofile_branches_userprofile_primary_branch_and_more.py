@@ -2,6 +2,12 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+import sys
+import os
+
+# Add the project root to the path to import safe_migration_utils
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from safe_migration_utils import SafeAddField, SafeAlterField
 
 
 class Migration(migrations.Migration):
@@ -15,7 +21,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
+        SafeAddField(
             model_name="userprofile",
             name="branches",
             field=models.ManyToManyField(
@@ -25,7 +31,7 @@ class Migration(migrations.Migration):
                 to="membership.branch",
             ),
         ),
-        migrations.AddField(
+        SafeAddField(
             model_name="userprofile",
             name="primary_branch",
             field=models.ForeignKey(
@@ -37,7 +43,7 @@ class Migration(migrations.Migration):
                 to="membership.branch",
             ),
         ),
-        migrations.AlterField(
+        SafeAlterField(
             model_name="userprofile",
             name="role",
             field=models.CharField(
