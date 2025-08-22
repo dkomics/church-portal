@@ -35,7 +35,15 @@ class SafeAddField(migrations.AddField):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.model_name)
         table_name = model._meta.db_table
-        column_name = self.field.column
+        
+        # Get column name - handle different field types
+        if hasattr(self.field, 'db_column') and self.field.db_column:
+            column_name = self.field.db_column
+        elif hasattr(self.field, 'column'):
+            column_name = self.field.column
+        else:
+            # For ForeignKey and other fields, construct column name
+            column_name = f"{self.name}_id" if self.field.many_to_one else self.name
         
         with connection.cursor() as cursor:
             cursor.execute("""
