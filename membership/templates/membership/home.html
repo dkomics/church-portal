@@ -1,5 +1,4 @@
 {% load static %}
-{% load dict_extras %}
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -73,21 +72,40 @@
       </div>
     </section>
 
-    <!-- Branch Selector (for authenticated users with multiple branches) -->
+    <!-- Branch Selector (for users with multiple branches) -->
     {% if user.is_authenticated and user_branches|length > 1 %}
-    <section class="branch-selector">
+    <div class="branch-selector">
       <h3>Chagua Tawi</h3>
       <div class="branch-cards">
-        {% for branch in user_branches %}
-        <div class="branch-card {% if branch == current_branch %}active{% endif %}">
-          <div class="branch-info">
-            <h4>{{ branch.name }}</h4>
-            <p>{{ branch.code }} - {{ branch_stats|get_item:branch.id.total_members|default:0 }} Washirika</p>
-          </div>
+      {% for branch in user_branches %}
+      <div class="branch-card {% if branch == current_branch %}active{% endif %}">
+        <div class="branch-info">
+          <h4>{{ branch.name }}</h4>
+          <p>{{ branch.code }} - Washirika</p>
         </div>
-        {% endfor %}
       </div>
-    </section>
+      {% endfor %}
+      </div>
+      
+      <!-- Branch Statistics -->
+      {% if branches_with_stats %}
+      <div class="branch-stats">
+        <h4>Takwimu za Matawi</h4>
+        <div class="branch-stats-grid">
+          {% for branch in branches_with_stats %}
+          <div class="branch-stat-card">
+            <h5>{{ branch.name }}</h5>
+            <div class="mini-stats">
+              <span>{{ branch.total_members }} Washirika</span>
+              <span>{{ branch.new_this_month }} Wapya</span>
+              <span>{{ branch.baptized }} Wamebatizwa</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
     {% endif %}
 
     <!-- Statistics Cards -->

@@ -84,21 +84,29 @@ def home_page(request):
             ).count(),
         }
         
-        # Calculate branch-specific statistics
+        # Calculate branch-specific statistics and attach to branch objects
         if context['user_branches']:
-            branch_stats = {}
+            branches_with_stats = []
             for branch in context['user_branches']:
                 branch_members = Member.objects.filter(branch=branch)
-                branch_stats[branch.id] = {
+                # Create a new object with branch data and stats
+                branch_data = {
+                    'id': branch.id,
                     'name': branch.name,
                     'code': branch.code,
+                    'address': branch.address,
+                    'phone': branch.phone,
+                    'email': branch.email,
+                    'pastor_name': branch.pastor_name,
+                    'is_active': branch.is_active,
                     'total_members': branch_members.count(),
                     'new_this_month': branch_members.filter(
                         registration_date__gte=current_month
                     ).count(),
                     'baptized': branch_members.filter(baptized='Yes').count(),
                 }
-            context['branch_stats'] = branch_stats
+                branches_with_stats.append(branch_data)
+            context['branches_with_stats'] = branches_with_stats
         
         # Get recent news (general + user's branches)
         news_queryset = News.objects.filter(
