@@ -52,7 +52,9 @@ class SafeAddField(migrations.AddField):
         # Handle ManyToManyField differently
         if self.field.many_to_many:
             # For ManyToMany fields, check the through table
-            through_table = f"{app_label}_{self.model_name.lower()}_{self.name}"
+            # The actual table name is: auth_user_profile_branches (for authentication.UserProfile.branches)
+            through_table = f"{table_name}_{self.name}"
+            
             if not check_table_exists(through_table):
                 super().database_forwards(app_label, schema_editor, from_state, to_state)
             else:
