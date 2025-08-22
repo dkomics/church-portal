@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 import logging
-from .models import Member
+from .models import Member, Branch, News
 from .serializers import MemberSerializer
 from authentication.views import can_view_directory, can_register_members
 from authentication.utils import log_user_action, filter_member_fields
@@ -26,41 +26,99 @@ class MemberPagination(PageNumberPagination):
     max_page_size = 100
 
 def home_page(request):
-    """Home page with basic statistics and robust error handling"""
+    """Home page with branch-aware statistics and features"""
     context = {
         'stats': {
             'total_members': 0,
             'new_members_this_month': 0,
             'baptized_members': 0,
             'membership_class_completed': 0,
-        }
+        },
+        'branches': [],
+        'user_branches': [],
+        'current_branch': None,
+        'recent_news': [],
+        'branch_stats': {}
     }
     
     try:
-        # Try to get real statistics from database
         from django.db.models import Count
         from datetime import datetime, timedelta
         
         # Get current month for filtering
         current_month = datetime.now().replace(day=1)
         
-        # Calculate statistics safely
+        # Get all active branches
+        context['branches'] = Branch.objects.filter(is_active=True).order_by('name')
+        
+        # Get user's accessible branches if authenticated
+        if request.user.is_authenticated and hasattr(request.user, 'profile'):
+            profile = request.user.profile
+            if profile.is_system_admin:
+                context['user_branches'] = Branch.objects.filter(is_active=True)
+                members_queryset = Member.objects.all()
+            else:
+                context['user_branches'] = profile.get_accessible_branches()
+                members_queryset = profile.get_accessible_members()
+            
+            # Set current branch (primary branch or first accessible branch)
+            if profile.primary_branch and profile.can_access_branch(profile.primary_branch):
+                context['current_branch'] = profile.primary_branch
+            elif context['user_branches'].exists():
+                context['current_branch'] = context['user_branches'].first()
+        else:
+            # For non-authenticated users, show all data
+            members_queryset = Member.objects.all()
+        
+        # Calculate overall statistics
         context['stats'] = {
-            'total_members': Member.objects.count(),
-            'new_members_this_month': Member.objects.filter(
+            'total_members': members_queryset.count(),
+            'new_members_this_month': members_queryset.filter(
                 registration_date__gte=current_month
             ).count(),
-            'baptized_members': Member.objects.filter(
-                baptism_status='baptized'
+            'baptized_members': members_queryset.filter(
+                baptized='Yes'
             ).count(),
-            'membership_class_completed': Member.objects.filter(
-                membership_class_completed=True
+            'membership_class_completed': members_queryset.filter(
+                membership_class='Yes'
             ).count(),
         }
+        
+        # Calculate branch-specific statistics
+        if context['user_branches']:
+            branch_stats = {}
+            for branch in context['user_branches']:
+                branch_members = Member.objects.filter(branch=branch)
+                branch_stats[branch.id] = {
+                    'name': branch.name,
+                    'code': branch.code,
+                    'total_members': branch_members.count(),
+                    'new_this_month': branch_members.filter(
+                        registration_date__gte=current_month
+                    ).count(),
+                    'baptized': branch_members.filter(baptized='Yes').count(),
+                }
+            context['branch_stats'] = branch_stats
+        
+        # Get recent news (general + user's branches)
+        news_queryset = News.objects.filter(
+            is_published=True,
+            publish_date__lte=timezone.now()
+        )
+        
+        if request.user.is_authenticated and hasattr(request.user, 'profile'):
+            if not request.user.profile.is_system_admin:
+                # Filter news for user's branches
+                user_branches = context['user_branches']
+                news_queryset = news_queryset.filter(
+                    Q(scope='general') | 
+                    Q(scope='branch', branch__in=user_branches)
+                )
+        
+        context['recent_news'] = news_queryset.order_by('-publish_date', '-priority')[:5]
+        
     except Exception as e:
-        # Log error but continue with default values
-        logger.error(f"Error calculating statistics: {str(e)}")
-        # Keep default stats from context initialization
+        logger.error(f"Error calculating home page data: {str(e)}")
         pass
     
     return render(request, 'membership/home.html', context)

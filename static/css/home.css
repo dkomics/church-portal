@@ -586,11 +586,277 @@ body {
     }
 }
 
+/* Branch Selector Styles */
+.branch-selector {
+    padding: 40px 30px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.branch-selector h3 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.branch-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.branch-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid #e9ecef;
+    cursor: pointer;
+}
+
+.branch-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: #3498db;
+}
+
+.branch-card.active {
+    border-color: #2ecc71;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+}
+
+.branch-card.active .branch-info h4,
+.branch-card.active .branch-info p {
+    color: white;
+}
+
+.branch-info h4 {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.branch-info p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Branch Statistics Styles */
+.branch-stats {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid #e9ecef;
+}
+
+.branch-stats h4 {
+    text-align: center;
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.branch-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.branch-stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.branch-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.branch-stat-card h5 {
+    font-size: 1rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.mini-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+.mini-stats span {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    font-weight: 500;
+}
+
+/* Recent News Styles */
+.recent-news {
+    padding: 60px 30px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.recent-news h3 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.news-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border-left: 4px solid #3498db;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.news-card.priority-urgent {
+    border-left-color: #e74c3c;
+}
+
+.news-card.priority-high {
+    border-left-color: #f39c12;
+}
+
+.news-card.priority-medium {
+    border-left-color: #3498db;
+}
+
+.news-card.priority-low {
+    border-left-color: #95a5a6;
+}
+
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    gap: 15px;
+}
+
+.news-header h4 {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin: 0;
+    font-weight: 600;
+    line-height: 1.3;
+    flex: 1;
+}
+
+.news-scope {
+    background: #ecf0f1;
+    color: #7f8c8d;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.news-content {
+    color: #7f8c8d;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.news-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.news-date {
+    color: #95a5a6;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.news-category {
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* User Branch Display */
+.user-branch {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+/* Responsive adjustments for new elements */
+@media (max-width: 768px) {
+    .branch-cards,
+    .branch-stats-grid,
+    .news-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .news-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .news-scope {
+        align-self: flex-start;
+    }
+    
+    .news-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .user-branch {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+}
+
 /* Focus indicators for keyboard navigation */
 .nav-link:focus-visible,
 .btn:focus-visible,
 .feature-link:focus-visible,
-.action-card:focus-visible {
+.action-card:focus-visible,
+.branch-card:focus-visible {
     outline: 3px solid #3498db;
     outline-offset: 2px;
 }

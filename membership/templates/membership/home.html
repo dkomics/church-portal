@@ -17,7 +17,10 @@
         </div>
         <div class="church-info">
           <h1 class="church-name">JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</h1>
-          <p class="church-subtitle">Mfumo wa Usajili wa Washirika - Arusha, Tanzania</p>
+          <p class="church-subtitle">
+            Mfumo wa Usajili wa Washirika
+            {% if current_branch %} - {{ current_branch.name }}{% endif %}
+          </p>
         </div>
       </div>
       <nav class="navigation">
@@ -29,11 +32,20 @@
         {% if user.is_authenticated %}
           <!-- Authenticated user menu -->
           <a href="{% url 'member-directory' %}" class="nav-link">Orodha</a>
+          {% if user.profile and user.profile.can_manage_attendance %}
+            <a href="/admin/membership/attendancesession/" class="nav-link">Mahudhurio</a>
+          {% endif %}
+          {% if user.profile and user.profile.can_manage_news %}
+            <a href="/admin/membership/news/" class="nav-link">Habari</a>
+          {% endif %}
           {% if user.profile and user.profile.role == 'admin' or user.is_superuser %}
             <a href="{% url 'authentication:admin_dashboard' %}" class="nav-link">Utawala</a>
           {% endif %}
           <div class="user-menu">
             <span class="user-greeting">Karibu, {{ user.get_full_name|default:user.username }}!</span>
+            {% if user.profile and user.profile.primary_branch %}
+              <span class="user-branch">{{ user.profile.primary_branch.name }}</span>
+            {% endif %}
             <a href="{% url 'authentication:member_profile' %}" class="nav-link">Wasifu</a>
             <a href="{% url 'authentication:logout' %}" class="nav-link logout-link">Toka</a>
           </div>
@@ -60,9 +72,26 @@
       </div>
     </section>
 
+    <!-- Branch Selector (for authenticated users with multiple branches) -->
+    {% if user.is_authenticated and user_branches|length > 1 %}
+    <section class="branch-selector">
+      <h3>Chagua Tawi</h3>
+      <div class="branch-cards">
+        {% for branch in user_branches %}
+        <div class="branch-card {% if branch == current_branch %}active{% endif %}">
+          <div class="branch-info">
+            <h4>{{ branch.name }}</h4>
+            <p>{{ branch.code }} - {{ branch_stats|get_item:branch.id.total_members|default:0 }} Washirika</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
     <!-- Statistics Cards -->
     <section class="statistics">
-      <h3>Takwimu za Ushirika</h3>
+      <h3>Takwimu za Ushirika{% if current_branch %} - {{ current_branch.name }}{% endif %}</h3>
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">👥</div>
@@ -96,7 +125,54 @@
           </div>
         </div>
       </div>
+
+      <!-- Branch-specific statistics for multi-branch users -->
+      {% if branch_stats and user_branches|length > 1 %}
+      <div class="branch-stats">
+        <h4>Takwimu za Matawi</h4>
+        <div class="branch-stats-grid">
+          {% for branch_id, stats in branch_stats.items %}
+          <div class="branch-stat-card">
+            <h5>{{ stats.name }} ({{ stats.code }})</h5>
+            <div class="mini-stats">
+              <span>👥 {{ stats.total_members }}</span>
+              <span>🆕 {{ stats.new_this_month }}</span>
+              <span>💧 {{ stats.baptized }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
     </section>
+
+    <!-- Recent News Section -->
+    {% if recent_news %}
+    <section class="recent-news">
+      <h3>Habari za Hivi Karibuni</h3>
+      <div class="news-grid">
+        {% for news in recent_news %}
+        <div class="news-card priority-{{ news.priority }}">
+          <div class="news-header">
+            <h4>{{ news.title }}</h4>
+            <span class="news-scope">
+              {% if news.scope == 'general' %}🌍 Jumla{% else %}🏢 {{ news.branch.name }}{% endif %}
+            </span>
+          </div>
+          <p class="news-content">{{ news.content|truncatewords:20 }}</p>
+          <div class="news-meta">
+            <span class="news-date">{{ news.publish_date|date:"d M Y" }}</span>
+            {% if news.category %}
+            <span class="news-category" style="background-color: {{ news.category.color }}">
+              {{ news.category.name }}
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
 
     <!-- Features Section -->
     <section class="features">
@@ -151,6 +227,34 @@
           <p>Hamisha orodha ya washirika katika mfumo wa CSV kwa matumizi mengine.</p>
           <a href="{% url 'member-directory' %}" class="feature-link">Hamisha →</a>
         </div>
+        
+        <!-- New Multi-Branch Features -->
+        {% if user.is_authenticated and user.profile.can_manage_attendance %}
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h4>Mahudhurio ya Ibada</h4>
+          <p>Rekodi na fuatilia mahudhurio ya washirika katika ibada mbalimbali.</p>
+          <a href="/admin/membership/attendancesession/" class="feature-link">Mahudhurio →</a>
+        </div>
+        {% endif %}
+        
+        {% if user.is_authenticated and user.profile.can_manage_news %}
+        <div class="feature-card">
+          <div class="feature-icon">📰</div>
+          <h4>Habari na Matangazo</h4>
+          <p>Chapisha habari za tawi au za jumla kwa washirika wote.</p>
+          <a href="/admin/membership/news/" class="feature-link">Habari →</a>
+        </div>
+        {% endif %}
+        
+        {% if branches|length > 1 %}
+        <div class="feature-card">
+          <div class="feature-icon">🏢</div>
+          <h4>Matawi ya Kanisa</h4>
+          <p>Mfumo unasaidia matawi {{ branches|length }} ya kanisa kwa utawala wa kando.</p>
+          <a href="/admin/membership/branch/" class="feature-link">Matawi →</a>
+        </div>
+        {% endif %}
       </div>
     </section>
 
