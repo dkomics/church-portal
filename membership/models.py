@@ -82,13 +82,19 @@ class Member(models.Model):
         editable=True  # admin can edit it in the Django admin UI
     )
     def save(self, *args, **kwargs):
-        # Auto-generate membership ID if not provided
-        if not self.membership_id:
+        # Auto-generate membership ID if not provided and branch is assigned
+        if not self.membership_id and self.branch:
             self.membership_id = self.generate_membership_id()
         super().save(*args, **kwargs)
     
     def generate_membership_id(self):
         """Generate a unique membership ID with branch code"""
+        # Check if branch is assigned
+        if not self.branch:
+            # Return a temporary ID or use default branch
+            year = timezone.now().year
+            return f"TEMP{year}{timezone.now().microsecond:06d}"
+        
         # Format: BRANCH_CODE + YEAR + 4-digit sequential number
         year = timezone.now().year
         branch_code = self.branch.code.upper()
