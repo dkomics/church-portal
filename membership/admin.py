@@ -139,16 +139,16 @@ class MemberAdmin(admin.ModelAdmin):
     
     actions = ['mark_as_baptized', 'mark_membership_class_complete', 'export_member_list']
     
-    # Custom CSS and JS
-    class Media:
-        css = {
-            'all': ('admin/css/custom_admin.css',)
-        }
-        js = ('admin/js/custom_admin.js',)
+    # Remove custom CSS/JS that might not exist in production
+    # class Media:
+    #     css = {
+    #         'all': ('admin/css/custom_admin.css',)
+    #     }
+    #     js = ('admin/js/custom_admin.js',)
     
     def get_queryset(self, request):
         """Optimize queryset for admin list view"""
-        return super().get_queryset(request).select_related()
+        return super().get_queryset(request).select_related('branch')
     
     def save_model(self, request, obj, form, change):
         """Custom save logic"""
