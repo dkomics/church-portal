@@ -6,40 +6,11 @@ from .models import Member, Branch, AttendanceSession, AttendanceRecord, News, N
 
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
-    # Simplified display configuration
-    list_display = ['membership_id', 'full_name', 'branch', 'gender', 'phone', 'registration_date']
-    list_display_links = ['membership_id', 'full_name']
+    # Absolute minimal configuration
+    list_display = ['id', 'full_name', 'branch']
     
-    # Basic filtering
-    list_filter = ['branch', 'gender', 'age_category', 'membership_type', 'baptized']
-    
-    # Search functionality
-    search_fields = ['full_name', 'membership_id', 'phone', 'email']
-    
-    # Ordering
-    ordering = ['-registration_date', 'full_name']
-    
-    # Simplified fieldsets
-    fieldsets = (
-        ('Basic Information', {
-            'fields': ('membership_id', 'branch', 'full_name', 'gender', 'age_category')
-        }),
-        ('Contact Information', {
-            'fields': ('phone', 'email', 'address'),
-        }),
-        ('Spiritual Information', {
-            'fields': ('baptized', 'baptism_date', 'membership_class'),
-        }),
-        ('Membership Details', {
-            'fields': ('membership_type', 'registration_date')
-        })
-    )
-    
-    # Read-only fields
-    readonly_fields = ['membership_id']
-    
-    # Items per page
-    list_per_page = 25
+    # No custom methods, no fieldsets, no filters - just basic fields
+    fields = ['full_name', 'branch', 'gender', 'phone', 'email', 'membership_type', 'registration_date']
 
 
 @admin.register(Branch)

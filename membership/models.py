@@ -82,9 +82,7 @@ class Member(models.Model):
         editable=True  # admin can edit it in the Django admin UI
     )
     def save(self, *args, **kwargs):
-        # Auto-generate membership ID if not provided and branch is assigned
-        if not self.membership_id and self.branch:
-            self.membership_id = self.generate_membership_id()
+        # Skip auto-generation in admin to prevent errors
         super().save(*args, **kwargs)
     
     def generate_membership_id(self):
