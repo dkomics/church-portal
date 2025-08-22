@@ -11,11 +11,20 @@ class UserProfile(models.Model):
         ('member', 'Member'),
         ('secretary', 'Secretary/Clerk'),
         ('pastor', 'Pastor/Leader'),
-        ('admin', 'Administrator'),
+        ('branch_admin', 'Branch Administrator'),
+        ('admin', 'System Administrator'),
     ]
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='member')
+    
+    # Branch assignment - users can only access their assigned branches
+    branches = models.ManyToManyField('membership.Branch', blank=True, related_name='users',
+                                    help_text="Branches this user has access to")
+    primary_branch = models.ForeignKey('membership.Branch', on_delete=models.SET_NULL, 
+                                     null=True, blank=True, related_name='primary_users',
+                                     help_text="Primary branch for this user")
+    
     phone = models.CharField(max_length=15, blank=True, null=True)
     membership_id = models.CharField(max_length=20, blank=True, null=True, 
                                    help_text="Link to member record if applicable")
@@ -39,27 +48,68 @@ class UserProfile(models.Model):
     @property
     def can_register_members(self):
         """Check if user can register new members"""
-        return self.role in ['secretary', 'pastor', 'admin']
+        return self.role in ['secretary', 'pastor', 'branch_admin', 'admin']
     
     @property
     def can_view_directory(self):
         """Check if user can view member directory"""
-        return self.role in ['secretary', 'pastor', 'admin']
+        return self.role in ['secretary', 'pastor', 'branch_admin', 'admin']
     
     @property
     def can_view_full_details(self):
         """Check if user can view full member details"""
-        return self.role in ['pastor', 'admin']
+        return self.role in ['pastor', 'branch_admin', 'admin']
     
     @property
     def can_manage_users(self):
         """Check if user can manage other users"""
-        return self.role == 'admin'
+        return self.role in ['branch_admin', 'admin']
     
     @property
     def can_export_data(self):
         """Check if user can export member data"""
-        return self.role in ['secretary', 'pastor', 'admin']
+        return self.role in ['secretary', 'pastor', 'branch_admin', 'admin']
+    
+    @property
+    def can_manage_attendance(self):
+        """Check if user can manage attendance"""
+        return self.role in ['secretary', 'pastor', 'branch_admin', 'admin']
+    
+    @property
+    def can_manage_news(self):
+        """Check if user can create/edit news"""
+        return self.role in ['pastor', 'branch_admin', 'admin']
+    
+    @property
+    def is_system_admin(self):
+        """Check if user is system administrator (can access all branches)"""
+        return self.role == 'admin'
+    
+    @property
+    def is_branch_admin(self):
+        """Check if user is branch administrator"""
+        return self.role == 'branch_admin'
+    
+    def get_accessible_branches(self):
+        """Get branches this user can access"""
+        if self.is_system_admin:
+            from membership.models import Branch
+            return Branch.objects.filter(is_active=True)
+        return self.branches.filter(is_active=True)
+    
+    def can_access_branch(self, branch):
+        """Check if user can access a specific branch"""
+        if self.is_system_admin:
+            return True
+        return self.branches.filter(id=branch.id).exists()
+    
+    def get_accessible_members(self):
+        """Get members this user can access"""
+        from membership.models import Member
+        if self.is_system_admin:
+            return Member.objects.all()
+        accessible_branches = self.get_accessible_branches()
+        return Member.objects.filter(branch__in=accessible_branches)
     
     def get_accessible_member_fields(self):
         """Return list of member fields this user can access"""
