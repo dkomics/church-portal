@@ -43,8 +43,15 @@ def home_page(request):
     
     # Branch-scoped mode: If branch is selected, show only that branch's data
     if current_branch:
+        # Get detailed single-branch statistics
+        single_branch_stats = get_branch_scoped_stats(request, current_branch)
+        
+        # Also get aggregated overview for comparison
+        aggregated_stats = get_aggregated_overview_stats(request)
+        
         context = {
-            'stats': get_branch_scoped_stats(request, current_branch),
+            'stats': single_branch_stats,
+            'aggregated_stats': aggregated_stats,
             'current_branch': current_branch,
             'user_branches': [],  # Hide other branches
             'recent_news': [],
@@ -96,13 +103,16 @@ def home_page(request):
                 else:
                     members_queryset = profile.get_accessible_members()
                 
-                # Calculate overall statistics across accessible branches
+                # Calculate aggregated overview statistics across all accessible branches
                 context['stats'] = {
                     'total_members': members_queryset.count(),
                     'new_members_this_month': members_queryset.filter(registration_date__gte=current_month).count(),
                     'baptized_members': members_queryset.filter(baptized='Yes').count(),
                     'membership_class_completed': members_queryset.filter(membership_class='Yes').count(),
                 }
+                
+                # Store as aggregated stats for consistency
+                context['aggregated_stats'] = context['stats']
                 
                 # Calculate branch-specific statistics for multi-branch view
                 branches_with_stats = []

@@ -74,7 +74,45 @@
             📋 Ona Orodha ya Washirika
           </a>
         </div>
-      </div>
+          </div>
+        </div>
+      {% else %}
+        <!-- Multi-Branch Mode: Show aggregated overview only -->
+        <h3>Takwimu za Ushirika (Matawi Yote)</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+              <h4>{{ stats.total_members|default:0 }}</h4>
+              <p>Jumla ya Washirika</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">🆕</div>
+            <div class="stat-content">
+              <h4>{{ stats.new_members_this_month|default:0 }}</h4>
+              <p>Washirika Wapya Mwezi Huu</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">💧</div>
+            <div class="stat-content">
+              <h4>{{ stats.baptized_members|default:0 }}</h4>
+              <p>Waliobatizwa</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">🎓</div>
+            <div class="stat-content">
+              <h4>{{ stats.membership_class_completed|default:0 }}</h4>
+              <p>Waliokamilisha Darasa</p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
     </section>
 
     <!-- Branch Selector (only show in multi-branch mode) -->
@@ -118,8 +156,34 @@
 
     <!-- Statistics Cards -->
     <section class="statistics">
-      <h3>Takwimu za Ushirika{% if current_branch %} - {{ current_branch.name }}{% endif %}</h3>
-      <div class="stats-grid">
+      {% if branch_mode == 'single' %}
+        <!-- Single Branch Mode: Show both aggregated overview and branch-specific stats -->
+        <div class="stats-comparison">
+          <!-- Aggregated Overview -->
+          <div class="overview-stats">
+            <h3>Takwimu za Jumla (Matawi Yote)</h3>
+            <div class="stats-grid mini">
+              <div class="stat-card overview">
+                <div class="stat-icon">🏢</div>
+                <div class="stat-content">
+                  <h4>{{ aggregated_stats.total_members|default:0 }}</h4>
+                  <p>Jumla ya Washirika</p>
+                </div>
+              </div>
+              <div class="stat-card overview">
+                <div class="stat-icon">📈</div>
+                <div class="stat-content">
+                  <h4>{{ aggregated_stats.new_members_this_month|default:0 }}</h4>
+                  <p>Wapya Mwezi Huu</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Branch-Specific Stats -->
+          <div class="branch-specific-stats">
+            <h3>Takwimu za {{ current_branch.name }}</h3>
+            <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">👥</div>
           <div class="stat-content">

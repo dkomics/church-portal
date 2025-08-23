@@ -124,7 +124,7 @@ def branch_scoped_queryset(queryset, request, branch_field='branch'):
 
 def get_branch_scoped_stats(request, branch=None):
     """
-    Get statistics scoped to the selected branch
+    Get detailed statistics scoped to the selected branch
     """
     from membership.models import Member
     from datetime import datetime
@@ -151,4 +151,32 @@ def get_branch_scoped_stats(request, branch=None):
         'new_members_this_month': branch_members.filter(registration_date__gte=current_month).count(),
         'baptized_members': branch_members.filter(baptized='Yes').count(),
         'membership_class_completed': branch_members.filter(membership_class='Yes').count(),
+    }
+
+
+def get_aggregated_overview_stats(request):
+    """
+    Get aggregated overview statistics across all user's accessible branches
+    """
+    from membership.models import Member
+    from datetime import datetime
+    
+    # Get current month for filtering
+    current_month = datetime.now().replace(day=1)
+    
+    # Get user's accessible members based on their role and branch assignments
+    if request.user.is_authenticated and hasattr(request.user, 'profile'):
+        profile = request.user.profile
+        if profile.is_system_admin:
+            members_queryset = Member.objects.all()
+        else:
+            members_queryset = profile.get_accessible_members()
+    else:
+        members_queryset = Member.objects.none()
+    
+    return {
+        'total_members': members_queryset.count(),
+        'new_members_this_month': members_queryset.filter(registration_date__gte=current_month).count(),
+        'baptized_members': members_queryset.filter(baptized='Yes').count(),
+        'membership_class_completed': members_queryset.filter(membership_class='Yes').count(),
     }
