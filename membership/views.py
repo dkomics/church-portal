@@ -74,6 +74,7 @@ def home_page(request):
             'current_branch': None,
             'recent_news': [],
             'branch_stats': {},
+            'branches_with_stats': [],  # Initialize empty for multi-branch mode
             'branch_mode': 'multi',  # Indicate multi-branch mode
             'show_branch_selector': True,
         }

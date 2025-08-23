@@ -95,8 +95,8 @@
       {% endfor %}
       </div>
       
-      <!-- Branch Statistics -->
-      {% if branches_with_stats %}
+      <!-- Branch Statistics (only show in multi-branch mode) -->
+      {% if branches_with_stats and branch_mode == 'multi' %}
       <div class="branch-stats">
         <h4>Takwimu za Matawi</h4>
         <div class="branch-stats-grid">
