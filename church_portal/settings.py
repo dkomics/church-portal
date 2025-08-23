@@ -162,8 +162,8 @@ if os.getenv('SENTRY_DSN'):
 
 # Production Security Settings
 if not DEBUG:
-    # HTTPS Settings
-    SECURE_SSL_REDIRECT = True
+    # HTTPS Settings - Temporarily disabled for debugging
+    SECURE_SSL_REDIRECT = False  # Temporarily disabled to debug 500 errors
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     
     # HSTS Settings
