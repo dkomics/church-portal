@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-...')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
-ALLOWED_HOSTS = ['jbfm-arusha.onrender.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['jbfm-arusha.onrender.com', '127.0.0.1', 'localhost', 'testserver']
 
 # Application definition
 INSTALLED_APPS = [
@@ -65,7 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # 'authentication.context_processors.user_profile_context',  # Temporarily disabled due to 500 error
+                'authentication.context_processors.user_profile_context',
             ],
         },
     },
