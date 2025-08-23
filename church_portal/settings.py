@@ -25,6 +25,33 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-...')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
+
+# Enable detailed error logging for production debugging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
 ALLOWED_HOSTS = ['jbfm-arusha.onrender.com', '127.0.0.1', 'localhost', 'testserver']
 
 # Application definition
