@@ -19,7 +19,12 @@
           <h1 class="church-name">JEHOVAH-NISSI BIBLE FELLOWSHIP MINISTRY</h1>
           <p class="church-subtitle">
             Mfumo wa Usajili wa Washirika
-            {% if current_branch %} - {{ current_branch.name }}{% endif %}
+            {% if current_branch and branch_mode == 'single' %}
+              <span class="branch-context"> - {{ current_branch.name }}</span>
+              <a href="{% url 'home' %}?reset=1" class="branch-reset-link" title="Rudi kwenye mchaguo wa matawi">
+                🔄 Badili Tawi
+              </a>
+            {% endif %}
           </p>
         </div>
       </div>
@@ -72,8 +77,8 @@
       </div>
     </section>
 
-    <!-- Branch Selector (for users with multiple branches) -->
-    {% if user.is_authenticated and user_branches|length > 1 %}
+    <!-- Branch Selector (only show in multi-branch mode) -->
+    {% if show_branch_selector and user.is_authenticated and user_branches|length > 1 %}
     <div class="branch-selector">
       <h3>Chagua Tawi</h3>
       <div class="branch-cards">

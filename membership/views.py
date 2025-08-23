@@ -27,100 +27,106 @@ class MemberPagination(PageNumberPagination):
 
 def home_page(request):
     """Home page with branch-aware statistics and features"""
+    from authentication.branch_context import BranchContextManager, get_branch_scoped_stats
+    
+    # Handle branch reset (clear context)
+    if request.GET.get('reset') == '1':
+        BranchContextManager.clear_branch_context(request)
+    
     # Handle branch selection from URL parameter
     selected_branch_id = request.GET.get('branch')
-    current_branch = None
+    if selected_branch_id:
+        BranchContextManager.set_branch_context(request, selected_branch_id)
     
-    if selected_branch_id and request.user.is_authenticated:
-        try:
-            # Verify user has access to this branch
-            user_branches = request.user.profile.branches.all() if hasattr(request.user, 'profile') else []
-            current_branch = user_branches.filter(id=selected_branch_id).first()
-        except:
-            pass
+    # Get current branch context
+    current_branch = BranchContextManager.get_branch_context(request)
     
-    context = {
-        'stats': {
-            'total_members': 0,
-            'new_members_this_month': 0,
-            'baptized_members': 0,
-            'membership_class_completed': 0,
-        },
-        'branches': [],
-        'user_branches': [],
-        'current_branch': None,
-        'recent_news': [],
-        'branch_stats': {}
-    }
-    
-    try:
-        from django.db.models import Count
-        from datetime import datetime, timedelta
-        
-        # Get current month for filtering
-        current_month = datetime.now().replace(day=1)
-        
-        # Get all active branches
-        context['branches'] = Branch.objects.filter(is_active=True).order_by('name')
-        
-        # Get user's accessible branches if authenticated
-        if request.user.is_authenticated and hasattr(request.user, 'profile'):
-            profile = request.user.profile
-            if profile.is_system_admin:
-                context['user_branches'] = Branch.objects.filter(is_active=True)
-                members_queryset = Member.objects.all()
-            else:
-                context['user_branches'] = profile.get_accessible_branches()
-                members_queryset = profile.get_accessible_members()
-            
-            # Set current branch (from URL parameter, primary branch, or first accessible branch)
-            if current_branch:
-                context['current_branch'] = current_branch
-            elif profile.primary_branch and profile.can_access_branch(profile.primary_branch):
-                context['current_branch'] = profile.primary_branch
-            elif context['user_branches'].exists():
-                context['current_branch'] = context['user_branches'].first()
-        else:
-            # For non-authenticated users, show all data
-            members_queryset = Member.objects.all()
-        
-        # Calculate overall statistics
-        context['stats'] = {
-            'total_members': members_queryset.count(),
-            'new_members_this_month': members_queryset.filter(
-                registration_date__gte=current_month
-            ).count(),
-            'baptized_members': members_queryset.filter(
-                baptized='Yes'
-            ).count(),
-            'membership_class_completed': members_queryset.filter(
-                membership_class='Yes'
-            ).count(),
+    # Branch-scoped mode: If branch is selected, show only that branch's data
+    if current_branch:
+        context = {
+            'stats': get_branch_scoped_stats(request, current_branch),
+            'current_branch': current_branch,
+            'user_branches': [],  # Hide other branches
+            'recent_news': [],
+            'branch_mode': 'single',  # Indicate single-branch mode
+            'show_branch_selector': False,
         }
         
-        # Calculate branch-specific statistics and attach to branch objects
-        if context['user_branches']:
-            branches_with_stats = []
-            for branch in context['user_branches']:
-                branch_members = Member.objects.filter(branch=branch)
-                # Create a new object with branch data and stats
-                branch_data = {
-                    'id': branch.id,
-                    'name': branch.name,
-                    'code': branch.code,
-                    'address': branch.address,
-                    'phone': branch.phone,
-                    'email': branch.email,
-                    'pastor_name': branch.pastor_name,
-                    'is_active': branch.is_active,
-                    'total_members': branch_members.count(),
-                    'new_this_month': branch_members.filter(
-                        registration_date__gte=current_month
-                    ).count(),
-                    'baptized': branch_members.filter(baptized='Yes').count(),
+        # Get branch-specific news
+        try:
+            context['recent_news'] = News.objects.filter(
+                branch=current_branch, is_published=True
+            ).order_by('-created_at')[:5]
+        except:
+            context['recent_news'] = []
+            
+    else:
+        # Multi-branch mode: Show branch selector and user's accessible branches
+        context = {
+            'stats': {
+                'total_members': 0,
+                'new_members_this_month': 0,
+                'baptized_members': 0,
+                'membership_class_completed': 0,
+            },
+            'branches': [],
+            'user_branches': [],
+            'current_branch': None,
+            'recent_news': [],
+            'branch_stats': {},
+            'branch_mode': 'multi',  # Indicate multi-branch mode
+            'show_branch_selector': True,
+        }
+        
+        try:
+            from django.db.models import Count
+            from datetime import datetime, timedelta
+            
+            # Get current month for filtering
+            current_month = datetime.now().replace(day=1)
+            
+            # Get user's accessible branches if authenticated
+            if request.user.is_authenticated and hasattr(request.user, 'profile'):
+                profile = request.user.profile
+                context['user_branches'] = BranchContextManager.get_user_branch_options(request.user)
+                
+                if profile.is_system_admin:
+                    members_queryset = Member.objects.all()
+                else:
+                    members_queryset = profile.get_accessible_members()
+                
+                # Calculate overall statistics across accessible branches
+                context['stats'] = {
+                    'total_members': members_queryset.count(),
+                    'new_members_this_month': members_queryset.filter(registration_date__gte=current_month).count(),
+                    'baptized_members': members_queryset.filter(baptized='Yes').count(),
+                    'membership_class_completed': members_queryset.filter(membership_class='Yes').count(),
                 }
-                branches_with_stats.append(branch_data)
-            context['branches_with_stats'] = branches_with_stats
+                
+                # Calculate branch-specific statistics for multi-branch view
+                branches_with_stats = []
+                for branch in context['user_branches']:
+                    branch_members = Member.objects.filter(branch=branch)
+                    branch_data = {
+                        'id': branch.id,
+                        'name': branch.name,
+                        'code': branch.code,
+                        'address': branch.address,
+                        'phone': branch.phone,
+                        'email': branch.email,
+                        'pastor_name': branch.pastor_name,
+                        'is_active': branch.is_active,
+                        'total_members': branch_members.count(),
+                        'new_this_month': branch_members.filter(
+                            registration_date__gte=current_month
+                        ).count(),
+                        'baptized': branch_members.filter(baptized='Yes').count(),
+                    }
+                    branches_with_stats.append(branch_data)
+                context['branches_with_stats'] = branches_with_stats
+        except Exception as e:
+            logger.warning(f"Error calculating statistics: {e}")
+            # Use default empty stats if calculation fails
         
         # Get recent news (general + user's branches)
         news_queryset = News.objects.filter(
@@ -138,10 +144,6 @@ def home_page(request):
                 )
         
         context['recent_news'] = news_queryset.order_by('-publish_date', '-priority')[:5]
-        
-    except Exception as e:
-        logger.error(f"Error calculating home page data: {str(e)}")
-        pass
     
     return render(request, 'membership/home.html', context)
 
