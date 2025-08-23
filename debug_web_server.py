@@ -7,8 +7,6 @@ import os
 import sys
 import django
 from pathlib import Path
-import requests
-import time
 
 # Add the project directory to Python path
 BASE_DIR = Path(__file__).resolve().parent
