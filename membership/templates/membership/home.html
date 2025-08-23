@@ -78,7 +78,10 @@
       <h3>Chagua Tawi</h3>
       <div class="branch-cards">
       {% for branch in user_branches %}
-      <div class="branch-card {% if branch == current_branch %}active{% endif %}">
+      <div class="branch-card {% if branch == current_branch %}active{% endif %}" 
+           data-branch-id="{{ branch.id }}" 
+           onclick="selectBranch({{ branch.id }}, '{{ branch.name }}')"
+           style="cursor: pointer;">
         <div class="branch-info">
           <h4>{{ branch.name }}</h4>
           <p>{{ branch.code }} - Washirika</p>

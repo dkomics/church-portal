@@ -212,9 +212,95 @@ class HomePage {
     }
 }
 
+// Branch selection functionality
+function selectBranch(branchId, branchName) {
+    // Update active state visually
+    document.querySelectorAll('.branch-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    const selectedCard = document.querySelector(`[data-branch-id="${branchId}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('active');
+    }
+    
+    // Store selected branch in session storage
+    sessionStorage.setItem('selectedBranch', JSON.stringify({
+        id: branchId,
+        name: branchName
+    }));
+    
+    // Show notification
+    showBranchNotification(`Umechagua tawi: ${branchName}`, 'success');
+    
+    // Reload page with branch parameter or update content dynamically
+    const currentUrl = new URL(window.location);
+    currentUrl.searchParams.set('branch', branchId);
+    window.location.href = currentUrl.toString();
+}
+
+// Show branch selection notification
+function showBranchNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `branch-notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-icon">✓</span>
+            <span class="notification-message">${message}</span>
+        </div>
+    `;
+    
+    // Style the notification
+    Object.assign(notification.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '15px 20px',
+        borderRadius: '8px',
+        backgroundColor: '#2ecc71',
+        color: 'white',
+        fontWeight: '500',
+        zIndex: '1000',
+        transform: 'translateX(100%)',
+        transition: 'transform 0.3s ease',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+    });
+
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new HomePage();
+    
+    // Restore selected branch from session storage
+    const selectedBranch = sessionStorage.getItem('selectedBranch');
+    if (selectedBranch) {
+        try {
+            const branch = JSON.parse(selectedBranch);
+            const branchCard = document.querySelector(`[data-branch-id="${branch.id}"]`);
+            if (branchCard && !branchCard.classList.contains('active')) {
+                branchCard.classList.add('active');
+            }
+        } catch (e) {
+            console.warn('Could not restore selected branch:', e);
+        }
+    }
 });
 
 // Handle page visibility changes

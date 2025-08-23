@@ -27,6 +27,18 @@ class MemberPagination(PageNumberPagination):
 
 def home_page(request):
     """Home page with branch-aware statistics and features"""
+    # Handle branch selection from URL parameter
+    selected_branch_id = request.GET.get('branch')
+    current_branch = None
+    
+    if selected_branch_id and request.user.is_authenticated:
+        try:
+            # Verify user has access to this branch
+            user_branches = request.user.profile.branches.all() if hasattr(request.user, 'profile') else []
+            current_branch = user_branches.filter(id=selected_branch_id).first()
+        except:
+            pass
+    
     context = {
         'stats': {
             'total_members': 0,
@@ -61,8 +73,10 @@ def home_page(request):
                 context['user_branches'] = profile.get_accessible_branches()
                 members_queryset = profile.get_accessible_members()
             
-            # Set current branch (primary branch or first accessible branch)
-            if profile.primary_branch and profile.can_access_branch(profile.primary_branch):
+            # Set current branch (from URL parameter, primary branch, or first accessible branch)
+            if current_branch:
+                context['current_branch'] = current_branch
+            elif profile.primary_branch and profile.can_access_branch(profile.primary_branch):
                 context['current_branch'] = profile.primary_branch
             elif context['user_branches'].exists():
                 context['current_branch'] = context['user_branches'].first()
